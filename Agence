@@ -1,0 +1,33 @@
+ class Agence
+    {
+        private List<Voiture> ListVoiture;
+        private List<Client> ListClient;
+        private List<Contrat> ListContrat;
+        private Maintenance Maintenance;
+        public Agence (Maintenance a)
+        {
+            ListVoiture = new List<Voiture>();
+            ListClient = new List<Client>();
+            ListContrat = new List<Contrat>();
+            Maintenance = a;
+        }
+
+        public void Affichage( )
+        {
+            foreach( Voiture c in ListVoiture)
+            {
+                Console.WriteLine(c.ToString());
+            }
+        }
+        public void Identification()
+        {
+            Console.WriteLine("Donnez moi le login ");
+            string login = Console.ReadLine();
+            bool teste = false;
+            foreach (Client c in ListClient)
+            {
+
+            }
+        }
+
+    }
