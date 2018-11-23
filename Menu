@@ -1,0 +1,75 @@
+namespace projetTeste
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Client c = new Client("Chevallier", "Ludovic", "2 rue du colonel Renards", "a", "mdp");
+            Maintenance m = new Maintenance();
+            Agence agence = new Agence(m);
+            agence.ListClient.Add(c);
+            Console.WriteLine("Bonjour Monsieur/Madame bienvenue à l'agence Lutin! Que voulez vous faire?");
+            Menu(agence);
+            
+            
+            Console.ReadKey();
+            
+        }
+        static void Menu(Agence agence)
+        {
+
+           
+            int choix=52;
+
+
+            while (choix > 2 || choix < 1)
+            {
+                
+                Console.WriteLine("1.Identifcation\n2.Affichage total");
+
+                choix = int.Parse(Console.ReadLine());
+            }
+            switch (choix)
+            {
+                case 1:// Identification
+
+
+                    Console.Clear();
+                    Console.WriteLine("Avez vous un compte?");
+                    int option = 52;
+                    while (option > 1 || option < 0)
+                    {
+                        Console.WriteLine("0.Non 1.Oui");
+                        option = int.Parse(Console.ReadLine());
+                    }
+                    if (option == 1)// Compte existant
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Nous allons commencez par une identification");
+                        Client a = agence.Identification();
+                        Console.WriteLine("Etes vous bien :");
+                        Console.WriteLine(a.ToString());
+
+                        Menu(agence);
+                    }
+                    else//Création de compte
+                    {
+                        Console.Clear();
+                        Client a = null;
+                        agence.AjoutClient( a);
+                        
+                        Menu(agence);
+                    }
+
+                    break;
+                case 2:// Affichage totale
+                    agence.AffichageTotale();
+                    Menu(agence);
+                    break;
+                default:
+                    break;
+            }
+
+        }
+    }
+}
