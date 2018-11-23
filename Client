@@ -1,0 +1,75 @@
+namespace projetTeste
+{
+    class Client
+    {
+        //attribut
+        private string logins;
+        private string prénom;
+        private string nom;
+        private int dateNaissance;
+        private string adresse;
+        private string email;
+        private string mdps;
+
+        public Client (string nom, string prénom,string adresse,string login, string mdp)
+        {
+            this.logins = login;
+            this.nom = nom;
+            this.prénom = prénom;
+            this.adresse = adresse;
+            this.logins = login;
+            this.mdps = mdp;
+        }
+
+        //Propriété
+        public string Login
+        {
+            get
+            {
+                return logins;
+            }
+            set
+            {
+                logins = value;
+            }
+        }
+        public string Nom
+        {
+            get
+            {
+                return nom;
+            }
+            set
+            {
+                nom = value;
+            }
+        }
+        public string Prénom
+        {
+            get
+            {
+                return prénom;
+            }
+            set
+            {
+                prénom = value;
+            }
+        }
+
+        //méthode
+        public bool Verifcation(string login, string  mdp)// cette méthode sera utilisé afin d'idetnifier le client ainsi on simplifiera le code d' Agence
+        {
+            bool teste=false;
+            if (logins==login && mdps==mdp)
+            {
+                teste = true;
+            }
+            return teste;
+
+        }
+        public override string ToString()
+        {
+            return "nom: " + nom + "\nprénom: " + prénom + "\n Adresse: " + adresse + "\n Email: " + email;
+        }
+    }
+}
