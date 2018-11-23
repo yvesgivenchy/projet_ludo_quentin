@@ -1,15 +1,30 @@
- class Agence
+ using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace projetTeste
+{
+    class Agence
     {
         private List<Voiture> ListVoiture;
-        private List<Client> ListClient;
+        private List<Client> listClient;
         private List<Contrat> ListContrat;
         private Maintenance Maintenance;
         public Agence (Maintenance a)
         {
             ListVoiture = new List<Voiture>();
-            ListClient = new List<Client>();
+            listClient = new List<Client>();
             ListContrat = new List<Contrat>();
             Maintenance = a;
+        }
+        public List<Client> ListClient
+        {
+            get
+            {
+                return listClient;
+            }
         }
 
         public void Affichage( )
@@ -19,15 +34,112 @@
                 Console.WriteLine(c.ToString());
             }
         }
-        public void Identification()
+        public Client Identification()
         {
-            Console.WriteLine("Donnez moi le login ");
-            string login = Console.ReadLine();
+            
+                Client a = null;
+                Console.WriteLine("Donnez moi le login ");
+                string login = Console.ReadLine();
+
+                Console.WriteLine("Donnez moi le mot de passes");
+                string mdp = Console.ReadLine();
+                Console.Clear();
+                bool teste = false;
+                while (!teste)
+                {
+                    foreach (Client c in ListClient)
+                    {
+                        if (c.Verifcation(login, mdp))
+                        {
+                            teste = true;
+                            a = c;
+                        }
+
+                    }
+                    if (!teste)
+                    {
+                    Console.Clear();
+                        Console.WriteLine("Il semblerait que le mot de passe ou le login donnez ne soit pas bon, veuillez s'il vous plait redonnez ");
+                        login = Console.ReadLine();
+                        mdp = Console.ReadLine();
+                    }
+                }
+            
+                return a;
+            
+           
+
+            
+        }
+        public void AjoutClient( Client A)
+        {
             bool teste = false;
+            string nom=null;
+            string prénom=null;
+            while (!teste)
+            {
+                teste = true;
+                Console.WriteLine("Donnez moi votre nom:");//vérifie nom prénom
+                 nom = Console.ReadLine();
+                Console.WriteLine("Donnez moi votre prénom:");
+                 prénom = Console.ReadLine();
+                foreach (Client c in ListClient)
+                {
+                    if (c.Nom == nom && c.Prénom==prénom) teste = false;
+                }
+                if (!teste)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Ils semblerait que votre nom  et prénom soit déjà prit");
+                    
+                }                
+            }
+            Console.Clear();
+            Console.WriteLine("Donnez moi votre adresse");
+            string adresse = Console.ReadLine();
+            Console.Clear();
+
+            teste = false;//vérifie le login et mdp
+            string login=null;
+            string mdp=null;
+            while (!teste)
+            {
+                teste = true;
+                Console.WriteLine("Donnez moi votre login");
+                 login = Console.ReadLine();
+                Console.WriteLine("Donnez moi votre mot de passes");
+                 mdp = Console.ReadLine();
+                foreach( Client c in ListClient)
+                {
+                    if (c.Verifcation(login, mdp))
+                    {
+                        teste = false;
+                    }
+                    
+                }
+                if (!teste)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Il semblerait que le mot de passe ou le login donnez  soit déjà prit, veuillez s'il vous plait en donnez un nouveau ");
+                                     
+                }
+                Console.Clear();
+            }
+
+
+            A = new Client(nom, prénom, adresse, login, mdp);
+            ListClient.Add(A);
+            Console.WriteLine(ListClient.Count);
+            
+        }
+        public void AffichageTotale()
+        {
             foreach (Client c in ListClient)
             {
-
+                Console.WriteLine(c.ToString());
+                Console.WriteLine("");
             }
         }
 
     }
+}
