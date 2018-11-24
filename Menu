@@ -1,10 +1,17 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
 namespace projetTeste
 {
     class Program
     {
         static void Main(string[] args)
         {
-            Client c = new Client("Chevallier", "Ludovic", "2 rue du colonel Renards", "a", "mdp");
+            Client c = new Client("Chevallier", "Ludovic", "Meudon", "a", "mdp");
+           
             Maintenance m = new Maintenance();
             Agence agence = new Agence(m);
             agence.ListClient.Add(c);
@@ -50,15 +57,15 @@ namespace projetTeste
                         Console.WriteLine("Etes vous bien :");
                         Console.WriteLine(a.ToString());
 
-                        Menu(agence);
+                        MenuClient (a, agence);
                     }
                     else//Création de compte
                     {
                         Console.Clear();
                         Client a = null;
-                        agence.AjoutClient( a);
+                        agence.AjoutClient( ref a);
                         
-                        Menu(agence);
+                        MenuClient(a,  agence);
                     }
 
                     break;
@@ -68,6 +75,45 @@ namespace projetTeste
                     break;
                 default:
                     break;
+            }
+            
+
+        }
+        static void MenuClient(Client a, Agence agence)
+        {
+            Console.Clear();
+            Console.WriteLine(a.ToString());
+            Console.WriteLine("login: " + a.Login + " \nmot de passe: " + a.Mdps);
+            Console.WriteLine();
+            Console.WriteLine("Bienvenue que voulez vous faire?");
+            Console.WriteLine("1.Modification du compte Client\n 2.Modification du Contrat\n3.revenir au Menu");
+            int choix = int.Parse(Console.ReadLine());
+            while (!agence.verification(choix, 1, 3))
+            {
+                Console.Clear();
+                Console.WriteLine(a.ToString());
+                Console.WriteLine("login: " + a.Login + " \nmot de passe: " + a.Mdps);
+                Console.WriteLine();
+                Console.WriteLine("redonnez moi un choix");
+                Console.WriteLine("1.Modification du compte Client\n2.Modification du Contrat\n3.revenir au Menu");
+                choix = int.Parse(Console.ReadLine());
+            }
+            switch (choix)
+            {
+                case 1 :
+                    Console.Clear();
+                    agence.ModifcationClient(a);
+                    MenuClient(a,agence);
+                    break;
+               case 2 :
+                    break;
+                case 3:
+                    Console.Clear();
+                    Menu(agence);
+                    break;
+                default:
+                    break;
+
             }
 
         }
