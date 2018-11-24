@@ -1,1 +1,63 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace version_1._0
+{
+    abstract class vehicule
+    {
+        //attribut
+        protected string immatriculation;
+        protected string marque;
+        protected string modele;
+        protected string couleur;
+        protected int agemin;
+        protected int dureeminpermis;
+        protected string carburant;
+        protected double tarif;
+        protected double cout;
+        protected int poid;
+        protected int nbplace;
+        protected bool reserve;
+        protected bool maintenance;
+        protected string typedepermis;
+        protected bool [] etatvehicule;
+        protected string[] localisation;
+
+        //constructeur
+
+        public vehicule(string immatriculation, string marque, string modele, string couleur,
+            int agemin, int dureeminpermis, string carburant,double tarif, int poid, int nbplace,string typedepermis)
+        {
+            this.immatriculation = immatriculation;
+            this.marque = marque;
+            this.modele = modele;
+            this.couleur = couleur;
+            this.agemin = agemin;
+            this.dureeminpermis = dureeminpermis;
+            this.carburant = carburant;
+            this.tarif = tarif;            
+            this.poid = poid;
+            this.nbplace = nbplace;
+            this.typedepermis = typedepermis;
+            
+        }
+
+        //propriete
+        public string Immatriculation
+        {
+            get
+            {
+                return immatriculation;
+            }
+        }
+
+        //methode
+        public abstract double CalculTarif(Client c);
+        public abstract bool VehiculeReserve();
+        public abstract bool Maintenance();
+    }
+}
 
