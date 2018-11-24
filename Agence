@@ -71,11 +71,12 @@ namespace projetTeste
 
             
         }
-        public void AjoutClient( Client A)
+        public void AjoutClient(ref  Client A)
         {
             bool teste = false;
             string nom=null;
             string prénom=null;
+            string adresse = null;
             while (!teste)
             {
                 teste = true;
@@ -83,21 +84,28 @@ namespace projetTeste
                  nom = Console.ReadLine();
                 Console.WriteLine("Donnez moi votre prénom:");
                  prénom = Console.ReadLine();
+                Console.WriteLine("Donnez moi votre adresse");
+                 adresse = Console.ReadLine();
+                Console.Clear();
                 foreach (Client c in ListClient)
                 {
-                    if (c.Nom == nom && c.Prénom==prénom) teste = false;
+                    if (c.Nom == nom && c.Prénom == prénom)
+                    {
+                        if (c.Adresse == adresse)
+                        {
+                            teste = false;
+                        }
+                    }
                 }
                 if (!teste)
                 {
                     Console.Clear();
-                    Console.WriteLine("Ils semblerait que votre nom  et prénom soit déjà prit");
+                    Console.WriteLine("Ils semblerait que votre nom  et prénom soit déjà prit et que votre adresse aussi, veuillez refaire la manipulation ");
                     
                 }                
             }
             Console.Clear();
-            Console.WriteLine("Donnez moi votre adresse");
-            string adresse = Console.ReadLine();
-            Console.Clear();
+          
 
             teste = false;//vérifie le login et mdp
             string login=null;
@@ -113,6 +121,7 @@ namespace projetTeste
                 {
                     if (c.Verifcation(login, mdp))
                     {
+                        
                         teste = false;
                     }
                     
@@ -123,14 +132,145 @@ namespace projetTeste
                     Console.WriteLine("Il semblerait que le mot de passe ou le login donnez  soit déjà prit, veuillez s'il vous plait en donnez un nouveau ");
                                      
                 }
-                Console.Clear();
+                
             }
 
 
             A = new Client(nom, prénom, adresse, login, mdp);
             ListClient.Add(A);
-            Console.WriteLine(ListClient.Count);
+            Console.WriteLine(A.Identifiant);
             
+        }
+        public void ModifcationClient(Client a)
+        {
+            Console.Clear();
+            Console.WriteLine(a.ToString());
+            Console.WriteLine("login: " + a.Login + " \nmot de passe: " + a.Mdps);
+            Console.WriteLine();
+            Console.WriteLine("Que voulez vous modifiez?");
+            bool teste = false;
+            int choix;
+            do
+            {
+                choix = 50;
+                Console.WriteLine("1. Nom  2.Prénom 3.Adresse 4.Login/mdp ");
+                while(choix>4|| choix < 1)
+                {
+                    choix = int.Parse(Console.ReadLine());
+                }
+                switch (choix)
+                {
+                    case 1:
+                        Console.Clear();
+                        Console.WriteLine("Donnez moi le nouveau nom");
+                        string nom = Console.ReadLine();
+                        a.Nom = nom;
+                        break;
+                    case 2:
+                        Console.Clear();
+                        Console.WriteLine("Donnez moi le nouveau prénom");
+                        string prénom = Console.ReadLine();
+                        a.Prénom = prénom;
+                        break;
+                    case 3:
+                        Console.Clear();
+                        Console.WriteLine("Donnez moi la nouvelle adresse");
+                        string adresse = Console.ReadLine();
+                        bool verif = true;
+                        do
+                        {
+                            foreach (Client c in ListClient)
+                            {
+                                if (c.Nom == a.Nom && c.Prénom == a.Prénom)
+                                {
+                                    if (c.Adresse == adresse)
+                                    {
+                                        verif = false;
+                                    }
+                                }
+                            }
+                            if (!verif)
+                            {
+                                Console.WriteLine("Ils sembleraient qu'un compte et déjà cette adresse ainsi que le même nom et prénom que vous veuillez recommencez la démarche");
+                                adresse = Console.ReadLine();
+                            }
+
+                        } while (!verif);
+                        a.Adresse = adresse;
+
+                        break;
+
+                    case 4 :
+
+                        Console.Clear();
+                        Console.WriteLine("Donnez moi le nouveau login et mdp");
+                        string login = Console.ReadLine();
+                        string mdp = Console.ReadLine();
+                        bool option = true;
+                        do
+                        {
+                            Console.Clear();
+                            
+                            login = Console.ReadLine();
+                            mdp = Console.ReadLine();
+                            foreach (Client c in ListClient)
+                            {
+                                if (c.Login == login && c.Mdps == mdp)
+                                {
+
+                                        option = false;
+                                    
+                                }
+                            }
+                            if (!option)
+                            {
+                                Console.WriteLine("Veuillez nous redonnez un nouveau login et mdp");
+                                login = Console.ReadLine();
+                                mdp = Console.ReadLine();
+
+                            }
+                        } while (!option);
+                        a.Login = login;
+                        a.Mdps = mdp;
+                        break;
+                        
+
+                    default:
+                        break;
+                }
+                Console.Clear();
+                int i = 0;
+                int identif = 0;
+                foreach(Client c in listClient)
+                {
+                    if (c.Identifiant == a.Identifiant)
+                    {
+                        identif = i; 
+
+                    }
+                    else i++;
+                }
+                ListClient[identif] = a;
+                Console.WriteLine("Voici votre nouveaux compte");
+                Console.WriteLine(a.ToString());
+                Console.WriteLine("Voulez vous continuez?");
+                Console.WriteLine("1.Oui 2.Non");
+                choix = 50;
+                while (!verification(choix,1,2))
+                {
+                    choix = int.Parse(Console.ReadLine());
+                }
+                if (choix == 1)
+                {
+                    teste = true;
+                    Console.Clear();
+                }
+                else teste = false;
+                
+            } while (teste == true);
+            
+
+
         }
         public void AffichageTotale()
         {
@@ -140,6 +280,13 @@ namespace projetTeste
                 Console.WriteLine("");
             }
         }
+        public bool verification(int choix, int a,int b)
+        {bool teste=false;
+            if (choix <= b && choix >= a) teste = true ;
+            return teste;
+
+        }
+        
 
     }
 }
