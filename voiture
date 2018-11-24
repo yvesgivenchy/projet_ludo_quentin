@@ -1,0 +1,54 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace version_1._0
+{
+    class voiture:vehicule
+    {
+        //attribut
+        private int nbporte;
+        private bool climatisation;
+        private bool transmition;
+        private int capacite;
+
+        //constructeur
+        public voiture(string immatriculation, string marque, string modele, string couleur,
+            int agemin, int dureeminpermis, string carburant, double tarif, int poid, int nbplace, string typedepermis,
+            int nbporte,bool climatisation,bool transmition,int capacite):base(immatriculation,marque,modele,couleur,agemin,dureeminpermis,
+                carburant,tarif,poid,nbplace,typedepermis)
+        {
+            this.nbporte = nbporte;
+            this.climatisation = climatisation;
+            this.transmition = transmition;
+            this.capacite = capacite;
+            reserve = VehiculeReserve();
+            maintenance = Maintenance();
+            cout = CalculTarif();
+            etatvehicule = new bool[5];
+            localisation = new string[2];
+        }
+
+        //méthode
+
+        public override double CalculTarif(Client c)
+        {
+
+            double coutcal = 0.0;
+            if (c.Age > agemin && c.Agepermis > dureeminpermis)
+            {
+                coutcal = tarif;
+            }
+            else
+            {
+                coutcal = tarif * 1.8;
+            }
+            return coutcal;
+            
+        }
+
+
+    }
+}
