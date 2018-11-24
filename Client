@@ -1,8 +1,15 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
 namespace projetTeste
 {
     class Client
     {
         //attribut
+        static int nbClient;
         private string logins;
         private string prénom;
         private string nom;
@@ -10,6 +17,8 @@ namespace projetTeste
         private string adresse;
         private string email;
         private string mdps;
+        private bool reservé;
+        private int identifiant;
 
         public Client (string nom, string prénom,string adresse,string login, string mdp)
         {
@@ -19,6 +28,10 @@ namespace projetTeste
             this.adresse = adresse;
             this.logins = login;
             this.mdps = mdp;
+            reservé = false;
+            identifiant = nbClient;
+            nbClient++;
+
         }
 
         //Propriété
@@ -53,6 +66,35 @@ namespace projetTeste
             set
             {
                 prénom = value;
+            }
+        }
+        public string Adresse
+        {
+            get
+            {
+                return adresse;
+            }
+            set
+            {
+                adresse = value;
+            }
+        }
+        public string Mdps
+        {
+            get
+            {
+                return mdps;
+            }
+            set
+            {
+                mdps = value;
+            }
+        }
+        public int Identifiant
+        {
+            get
+            {
+                return identifiant;
             }
         }
 
