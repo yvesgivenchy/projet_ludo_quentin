@@ -13,19 +13,24 @@ namespace projetTeste
         private string logins;
         private string prénom;
         private string nom;
-        private int dateNaissance;
+        private string dateNaissance;
+        private int agepermis;
+        private int age;
         private string adresse;
         private string email;
         private string mdps;
         private bool reservé;
         private int identifiant;
 
-        public Client (string nom, string prénom,string adresse,string login, string mdp)
+        public Client(string nom, string prénom, string dateNaissance, int agepermis, int age, string adresse, string login, string mdp)
         {
             this.logins = login;
             this.nom = nom;
             this.prénom = prénom;
             this.adresse = adresse;
+            this.dateNaissance = dateNaissance;
+            this.agepermis = agepermis;
+            age = CalculAge();
             this.logins = login;
             this.mdps = mdp;
             reservé = false;
@@ -46,6 +51,7 @@ namespace projetTeste
                 logins = value;
             }
         }
+
         public string Nom
         {
             get
@@ -98,11 +104,36 @@ namespace projetTeste
             }
         }
 
-        //méthode
-        public bool Verifcation(string login, string  mdp)// cette méthode sera utilisé afin d'idetnifier le client ainsi on simplifiera le code d' Agence
+        public int Agepermis
         {
-            bool teste=false;
-            if (logins==login && mdps==mdp)
+            get
+            {
+                return agepermis;
+            }
+        }
+
+        public int Age
+        {
+            get
+            {
+                return age;
+            }
+        }
+
+        //méthode
+        public int CalculAge()
+        {
+            int age = 0;
+            string[] tab = new string[3];
+            tab = dateNaissance.Split('/');
+            age = 2018 - Convert.ToInt32(tab[2]);
+            return age;
+
+        }
+        public bool Verifcation(string login, string mdp)// cette méthode sera utilisé afin d'idetnifier le client ainsi on simplifiera le code d' Agence
+        {
+            bool teste = false;
+            if (logins == login && mdps == mdp)
             {
                 teste = true;
             }
