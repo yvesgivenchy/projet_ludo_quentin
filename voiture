@@ -15,9 +15,9 @@ namespace projetTeste
         private int capacite;
 
         //constructeur
-        public voiture(string immatriculation, string marque, string modele, string couleur,
+        public voiture(string immatriculation, string marque, string modele,
             int agemin, int dureeminpermis, string carburant, double tarif, int poid, int nbplace, string typedepermis,
-            int nbporte,bool climatisation,bool transmission,int capacite,string typeVehicule):base(immatriculation,marque,modele,couleur,agemin,dureeminpermis,
+            int nbporte,bool climatisation,bool transmission,int capacite,string typeVehicule):base(immatriculation,marque,modele,agemin,dureeminpermis,
                 carburant,tarif,poid,nbplace,typedepermis,typeVehicule)
         {
             this.nbporte = nbporte;
@@ -31,6 +31,12 @@ namespace projetTeste
         public override string ToString()
         {
             return base.ToString() + "\n Nombre de portes : " + nbporte + "\n Climatisation : " + climatisation + "\n Transmission " + transmission
+                + "\n Capacité : " + capacite;
+        }
+
+        public override string AffichageVehiculeclient()
+        {
+            return base.AffichageVehiculeclient()+ "\n Nombre de portes : " + nbporte + "\n Climatisation : " + climatisation + "\n Transmission: " + transmission
                 + "\n Capacité : " + capacite;
         }
 
