@@ -14,30 +14,27 @@ namespace projetTeste
         private string prénom;
         private string nom;
         private string dateNaissance;
-        private int agepermis;
-        private int dureepermis;
-        private int age;
         private string adresse;
         private string email;
         private string mdps;
-        private bool reservé;
+        private bool reserve;
         private int identifiant;
+        private int agepermis;
+        
 
-        public Client(string nom, string prénom, string dateNaissance, int agepermis, string adresse, string login, string mdp)
+        public Client (string nom, string prénom,string adresse,string login, string mdp, string dateNaissance, int agepermis)
         {
             this.logins = login;
             this.nom = nom;
             this.prénom = prénom;
             this.adresse = adresse;
-            this.dateNaissance = dateNaissance;
-            this.agepermis = agepermis;
-            dureepermis = CalculAgePermis();
-            age = CalculAge();
             this.logins = login;
             this.mdps = mdp;
-            reservé = false;
+            reserve = false;
             identifiant = nbClient;
             nbClient++;
+            this.dateNaissance = dateNaissance;
+            this.agepermis = agepermis;
 
         }
 
@@ -53,7 +50,6 @@ namespace projetTeste
                 logins = value;
             }
         }
-
         public string Nom
         {
             get
@@ -105,22 +101,25 @@ namespace projetTeste
                 return identifiant;
             }
         }
-
-        public int Agepermis
+        public bool Reserve
         {
             get
             {
-                return agepermis;
+                return reserve;
+            }
+            set
+            {
+                reserve = value;
             }
         }
-
-        public int Age
+        public string DatedeNiassance
         {
             get
             {
-                return age;
+                return dateNaissance;
             }
         }
+
 
         //méthode
         public int CalculAge()
@@ -135,15 +134,15 @@ namespace projetTeste
 
         public int CalculAgePermis()
         {
-            int age = 0;            
+            int age = 0;
             age = 2018 - agepermis;
             return age;
 
         }
-        public bool Verifcation(string login, string mdp)// cette méthode sera utilisé afin d'idetnifier le client ainsi on simplifiera le code d' Agence
+        public bool Verifcation(string login, string  mdp)// cette méthode sera utilisé afin d'idetnifier le client ainsi on simplifiera le code d' Agence
         {
-            bool teste = false;
-            if (logins == login && mdps == mdp)
+            bool teste=false;
+            if (logins==login && mdps==mdp)
             {
                 teste = true;
             }
@@ -154,5 +153,5 @@ namespace projetTeste
         {
             return "nom: " + nom + "\nprénom: " + prénom + "\n Adresse: " + adresse + "\n Email: " + email;
         }
-     }   
+    }
 }
