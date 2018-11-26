@@ -15,6 +15,7 @@ namespace projetTeste
         private string nom;
         private string dateNaissance;
         private int agepermis;
+        private int dureepermis;
         private int age;
         private string adresse;
         private string email;
@@ -22,7 +23,7 @@ namespace projetTeste
         private bool reservé;
         private int identifiant;
 
-        public Client(string nom, string prénom, string dateNaissance, int agepermis, int age, string adresse, string login, string mdp)
+        public Client(string nom, string prénom, string dateNaissance, int agepermis, string adresse, string login, string mdp)
         {
             this.logins = login;
             this.nom = nom;
@@ -30,6 +31,7 @@ namespace projetTeste
             this.adresse = adresse;
             this.dateNaissance = dateNaissance;
             this.agepermis = agepermis;
+            dureepermis = CalculAgePermis();
             age = CalculAge();
             this.logins = login;
             this.mdps = mdp;
@@ -130,6 +132,14 @@ namespace projetTeste
             return age;
 
         }
+
+        public int CalculAgePermis()
+        {
+            int age = 0;            
+            age = 2018 - agepermis;
+            return age;
+
+        }
         public bool Verifcation(string login, string mdp)// cette méthode sera utilisé afin d'idetnifier le client ainsi on simplifiera le code d' Agence
         {
             bool teste = false;
@@ -144,5 +154,5 @@ namespace projetTeste
         {
             return "nom: " + nom + "\nprénom: " + prénom + "\n Adresse: " + adresse + "\n Email: " + email;
         }
-    }
+     }   
 }
