@@ -134,9 +134,19 @@ namespace projetTeste
                 }
                 
             }
+            Console.WriteLine("Donnez moi votre date de naissance sous le format j/m/a");
+            Console.WriteLine("jour");
+            string jour = Console.ReadLine();
+            Console.WriteLine("mois");
+            string mois = Console.ReadLine();
+            Console.WriteLine("année");
+            string année = Console.ReadLine();
+            string dateNaissance = jour + "/" + mois + "/" + année;
+            Console.WriteLine("Donnez moi l'année d'obtention de votre permis");
+            int agepermis = int.Parse(Console.ReadLine());
 
 
-            A = new Client(nom, prénom, adresse, login, mdp);
+            A = new Client(nom, prénom, adresse, login, mdp,dateNaissance,agepermis);
             ListClient.Add(A);
             Console.WriteLine(A.Identifiant);
             
@@ -268,10 +278,47 @@ namespace projetTeste
                 else teste = false;
                 
             } while (teste == true);
+           
             
 
 
         }
+        public void ModificationContrat(Client c)
+        {
+            bool teste = c.Reserve;
+            Contrat contrat = null;
+            if (teste)
+            {
+                foreach(Contrat C in ListContrat)
+                {
+                    if (C.Client.Identifiant == c.Identifiant)
+                    {
+                        contrat = C;
+
+                    }
+                }
+                Console.WriteLine("Vous avez une voiture");
+                vehicule v = contrat.Vehicule;
+                Console.WriteLine();
+                Console.WriteLine("Que voulez vous faire?");
+                Console.WriteLine("1.Modifiez la voiture\n 2.Modifiez le nb de kilométrage\n");
+                int choix;
+                do
+                {
+                    choix = int.Parse(Console.ReadLine());
+                } while (verification(choix, 1, 2));
+                switch (choix)
+                {
+                    case 1:
+
+                    break;
+
+                    case 2:
+                    break;
+                }
+            }
+        }
+        
         public void AffichageTotale()
         {
             foreach (Client c in ListClient)
