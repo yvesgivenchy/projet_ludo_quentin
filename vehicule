@@ -16,10 +16,10 @@ namespace version_1._0
         protected int agemin;
         protected int dureeminpermis;
         protected string carburant;
-        protected double tarif;
-        protected double cout;
+        protected double tarif;        
         protected int poid;
         protected int nbplace;
+        protected string typeVehicule;
         protected bool reserve;
         protected bool maintenance;
         protected string typedepermis;
@@ -29,7 +29,7 @@ namespace version_1._0
         //constructeur
 
         public vehicule(string immatriculation, string marque, string modele, string couleur,
-            int agemin, int dureeminpermis, string carburant,double tarif, int poid, int nbplace,string typedepermis)
+            int agemin, int dureeminpermis, string carburant,double tarif, int poid, int nbplace,string typedepermis,string typeVehicule)
         {
             this.immatriculation = immatriculation;
             this.marque = marque;
@@ -42,7 +42,10 @@ namespace version_1._0
             this.poid = poid;
             this.nbplace = nbplace;
             this.typedepermis = typedepermis;
-            
+            this.typeVehicule = typeVehicule;
+            etatvehicule = new bool[5];
+            localisation = new string[2];
+
         }
 
         //propriete
@@ -53,11 +56,69 @@ namespace version_1._0
                 return immatriculation;
             }
         }
+        public double Tarif
+        {
+            get
+            {
+                return tarif;
+            }
+        }
 
-        //methode
-        public abstract double CalculTarif(Client c);
-        public abstract bool VehiculeReserve();
-        public abstract bool Maintenance();
+        public int Agemin
+        {
+            get
+            {
+                return agemin;
+            }
+        }
+
+        public int DureeMinPermis
+        {
+            get
+            {
+                return dureeminpermis;
+            }
+        }
+
+        public bool Reserve
+        {
+            get
+            {
+                return reserve;
+            }
+        }
+
+        public bool [] Etatvehicule
+        {
+            get
+            {
+                return etatvehicule;
+            }
+        }
+
+        public string [] Localisation
+        {
+            get
+            {
+                return localisation;
+            }
+        }
+
+        public string TypedePermis
+        {
+            get
+            {
+                return typedepermis;
+            }
+        }
+
+        //methode        
+       
+        public override string ToString()
+        {
+            return "Marque : " + marque + "\n Modèle : " + modele + "\n Couleur : " + couleur +"\n Type de Véhicule : "+ typeVehicule+ "\n Carburant :" + carburant +
+                "\n Nombre de place " + nbplace + "\n Poid :" + poid + "\n Permis requis :" + typedepermis;
+        }
     }
 }
 
