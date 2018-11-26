@@ -1,0 +1,34 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace projetTeste
+{
+    class camion:vehicule
+    {
+        //attribut
+        private double poidcharge;
+        private string dimmensioncharge;        
+
+        //consctructeur
+        public camion (string immatriculation, string marque, string modele, string couleur,
+            int agemin, int dureeminpermis, string carburant, double tarif, int poid, int nbplace, string typedepermis,
+            string typeVehicule,double poidcharge,string dimmensioncharge) : base(immatriculation, marque, modele, couleur, agemin, dureeminpermis, carburant, tarif,
+                poid, nbplace, typedepermis, typeVehicule)
+        {
+            this.poidcharge = poidcharge;
+            this.dimmensioncharge = dimmensioncharge;
+            
+
+        }
+
+        //methode
+        public override string ToString()
+        {
+            return base.ToString()+"\n PATC : "+poidcharge+"\n Dimmension de charge : " + dimmensioncharge;
+        }
+
+    }
+}
