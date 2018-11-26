@@ -11,8 +11,7 @@ namespace version_1._0
         //attribut
         protected string immatriculation;
         protected string marque;
-        protected string modele;
-        protected string couleur;
+        protected string modele;        
         protected int agemin;
         protected int dureeminpermis;
         protected string carburant;
@@ -28,13 +27,12 @@ namespace version_1._0
 
         //constructeur
 
-        public vehicule(string immatriculation, string marque, string modele, string couleur,
-            int agemin, int dureeminpermis, string carburant,double tarif, int poid, int nbplace,string typedepermis,string typeVehicule)
+        public vehicule(string immatriculation, string marque, string modele, int agemin,
+            int dureeminpermis, string carburant,double tarif, int poid, int nbplace,string typedepermis,string typeVehicule)
         {
             this.immatriculation = immatriculation;
             this.marque = marque;
-            this.modele = modele;
-            this.couleur = couleur;
+            this.modele = modele;            
             this.agemin = agemin;
             this.dureeminpermis = dureeminpermis;
             this.carburant = carburant;
@@ -116,8 +114,16 @@ namespace version_1._0
        
         public override string ToString()
         {
-            return "Marque : " + marque + "\n Modèle : " + modele + "\n Couleur : " + couleur +"\n Type de Véhicule : "+ typeVehicule+ "\n Carburant :" + carburant +
+            return " Type de Véhicule : " + typeVehicule + " \n Marque : " + marque + "\n Modèle : " + modele +  "\n Carburant :" + carburant +
                 "\n Nombre de place " + nbplace + "\n Poid :" + poid + "\n Permis requis :" + typedepermis;
+        }
+
+        public virtual string AffichageVehiculeclient()
+        {
+            string str = "";
+            str = " Type de Véhicule : " + typeVehicule + " \n Marque : " + marque + "\n Modèle : " + modele +
+                "\n Nombre de place " + nbplace ;
+            return str;
         }
     }
 }
