@@ -1,0 +1,35 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace projetTeste
+{
+    class moto:vehicule
+    {
+        //attributs
+        private int cylindre;
+        private int hauteurselle;
+        private int puissance;
+
+        //construteur
+        public moto(string immatriculation, string marque, string modele, string couleur,
+            int agemin, int dureeminpermis, string carburant, double tarif, int poid, int nbplace, string typedepermis, 
+            string typeVehicule, int cylindre, int hauteurselle,int puissance):base(immatriculation,marque,modele,couleur,agemin,dureeminpermis,carburant,tarif,
+                poid, nbplace, typedepermis, typeVehicule)
+        {
+            this.cylindre = cylindre;
+            this.hauteurselle = hauteurselle;
+            this.puissance = puissance;
+        }
+
+        //propriete
+
+        //methode
+        public override string ToString()
+        {
+            return base.ToString() + "\n Cylindré :" + cylindre + "\n Hauteur de la selle en cm : " + hauteurselle + "\n Puissance : " + puissance;
+        }
+    }
+}
