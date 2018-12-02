@@ -4,21 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace projetTeste
+namespace version_1._0
 {
     class voiture:vehicule
     {
         //attribut
         private int nbporte;
-        private bool climatisation;
-        private bool transmission;
+        private bool climatisation;        
         private int capacite;
 
         //constructeur
         public voiture(string immatriculation, string marque, string modele,
-            int agemin, int dureeminpermis, string carburant, double tarif, int poid, int nbplace, string typedepermis,
-            int nbporte,bool climatisation,bool transmission,int capacite,string typeVehicule):base(immatriculation,marque,modele,agemin,dureeminpermis,
-                carburant,tarif,poid,nbplace,typedepermis,typeVehicule)
+            int agemin, int dureeminpermis, string carburant, double tarif, int nbplace, string typedepermis,
+            int nbporte,bool climatisation,int capacite,string typeVehicule, string transmission) :base(immatriculation,marque,modele,agemin,dureeminpermis,
+                carburant,tarif,nbplace,typedepermis,typeVehicule,transmission)
         {
             this.nbporte = nbporte;
             this.climatisation = climatisation;
