@@ -4,20 +4,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace projetTeste
+namespace version_1._0
 {
     class camion:vehicule
     {
         //attribut
         private double poidcharge;
-        private string dimmensioncharge;        
+        private string dimmensioncharge;
+        private int poid;
 
         //consctructeur
-        public camion (string immatriculation, string marque, string modele, string couleur,
-            int agemin, int dureeminpermis, string carburant, double tarif, int poid, int nbplace, string typedepermis,
-            string typeVehicule,double poidcharge,string dimmensioncharge) : base(immatriculation, marque, modele, couleur, agemin, dureeminpermis, carburant, tarif,
-                poid, nbplace, typedepermis, typeVehicule)
+        public camion (string immatriculation, string marque, string modele,
+            int agemin, int dureeminpermis, string carburant, double tarif, int nbplace, string typedepermis,
+            string typeVehicule,double poidcharge,string dimmensioncharge,int poid, string transmission) : base(immatriculation, marque, modele, agemin, dureeminpermis, carburant, tarif,
+                 nbplace, typedepermis, typeVehicule,transmission)
         {
+            this.poid = poid;
             this.poidcharge = poidcharge;
             this.dimmensioncharge = dimmensioncharge;
             
@@ -27,7 +29,38 @@ namespace projetTeste
         //methode
         public override string ToString()
         {
-            return base.ToString()+"\n PATC : "+poidcharge+"\n Dimmension de charge : " + dimmensioncharge;
+            return base.ToString()+"\n Poid : "+poid+"\n PATC : "+poidcharge+"\n Dimmension de charge : " + dimmensioncharge;
+        }
+
+        public override string AffichageVehiculeclient()
+        {
+            return base.AffichageVehiculeclient()+ "\n PATC : " + poidcharge + "\n Dimmension de charge : " + dimmensioncharge;
+        }
+        public double PoidCharge
+        {
+            get
+            {
+                return poidcharge;
+                
+            }
+            set
+            {
+                poidcharge=value;
+            }
+
+        }
+        public string Dimmensioncharge
+        {
+            get
+            {
+                return dimmensioncharge;
+                
+            }
+            set
+            {
+                dimmensioncharge=value;
+            }
+
         }
 
     }
