@@ -16,19 +16,19 @@ namespace version_1._0
         protected int dureeminpermis;
         protected string carburant;
         protected double tarif;        
-        protected int poid;
-        protected int nbplace;
+        protected int nbplace;        
         protected string typeVehicule;
         protected bool reserve;
         protected bool maintenance;
         protected string typedepermis;
-        protected bool [] etatvehicule;
+        protected bool[] etatvehicule;
         protected string[] localisation;
+        protected string transmission;
 
         //constructeur
 
-        public vehicule(string immatriculation, string marque, string modele, int agemin,
-            int dureeminpermis, string carburant,double tarif, int poid, int nbplace,string typedepermis,string typeVehicule)
+        public vehicule(string immatriculation, string marque, string modele,
+            int agemin, int dureeminpermis, string carburant, double tarif, int nbplace, string typedepermis, string typeVehicule, string transmission)
         {
             this.immatriculation = immatriculation;
             this.marque = marque;
@@ -37,7 +37,6 @@ namespace version_1._0
             this.dureeminpermis = dureeminpermis;
             this.carburant = carburant;
             this.tarif = tarif;            
-            this.poid = poid;
             this.nbplace = nbplace;
             this.typedepermis = typedepermis;
             this.typeVehicule = typeVehicule;
@@ -86,7 +85,7 @@ namespace version_1._0
             }
         }
 
-        public bool [] Etatvehicule
+        public bool[] Etatvehicule
         {
             get
             {
@@ -94,7 +93,7 @@ namespace version_1._0
             }
         }
 
-        public string [] Localisation
+        public string[] Localisation
         {
             get
             {
@@ -109,22 +108,43 @@ namespace version_1._0
                 return typedepermis;
             }
         }
+        public string TypeVehicule
+        {
+            get
+            {
+                return typeVehicule;
+            }
+            set
+            {
+                typeVehicule = value;
+            }
+        }
+        public string Transmission
+        {
+            get
+            {
+                return transmission;
+            }
+            set
+            {
+                transmission=value;
+            }
+        }
 
         //methode        
-       
+
         public override string ToString()
         {
-            return " Type de Véhicule : " + typeVehicule + " \n Marque : " + marque + "\n Modèle : " + modele +  "\n Carburant :" + carburant +
-                "\n Nombre de place " + nbplace + "\n Poid :" + poid + "\n Permis requis :" + typedepermis;
+            return "Marque : " + marque + "\n Modèle : " + modele +  "\n Type de Véhicule : " + typeVehicule + "\n Carburant :" + carburant +
+                "\n Nombre de place " + nbplace + "\n Permis requis :" + typedepermis;
         }
 
         public virtual string AffichageVehiculeclient()
         {
             string str = "";
-            str = " Type de Véhicule : " + typeVehicule + " \n Marque : " + marque + "\n Modèle : " + modele +
-                "\n Nombre de place " + nbplace ;
+            str = "\n Type de véhicule : " + typeVehicule + "\n Marque : " + marque + "\n Modèle : " + modele+"\n Transmission:"+ transmission;
             return str;
+
         }
     }
 }
-
