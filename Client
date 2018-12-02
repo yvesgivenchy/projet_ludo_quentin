@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace projetTeste
+namespace version_1._0
 {
     class Client
     {
         //attribut
         static int nbClient;
         private string logins;
-        private string prénom;
+        private string prenom;
         private string nom;
         private string dateNaissance;
         private string adresse;
@@ -19,22 +19,27 @@ namespace projetTeste
         private string mdps;
         private bool reserve;
         private int identifiant;
+        private int obtentionpermis;
         private int agepermis;
+        public string typePermis;
         
 
-        public Client (string nom, string prénom,string adresse,string login, string mdp, string dateNaissance, int agepermis)
+        public Client (string nom, string prenom,string adresse,string login, string mdp, string email, string dateNaissance, int obtentionpermis,string typePermis)
         {
             this.logins = login;
             this.nom = nom;
-            this.prénom = prénom;
+            this.prenom = prenom;
             this.adresse = adresse;
             this.logins = login;
             this.mdps = mdp;
+            this.email = email;
+            this.typePermis=typePermis;
             reserve = false;
             identifiant = nbClient;
             nbClient++;
             this.dateNaissance = dateNaissance;
-            this.agepermis = agepermis;
+            this.obtentionpermis= obtentionpermis;
+            agepermis = CalculAgePermis();
 
         }
 
@@ -61,11 +66,11 @@ namespace projetTeste
                 nom = value;
             }
         }
-        public string Prénom
+        public string Prenom
         {
             get
             {
-                return prénom;
+                return prenom;
             }
             set
             {
@@ -119,6 +124,19 @@ namespace projetTeste
                 return dateNaissance;
             }
         }
+        public string TypePermis
+        {
+            get
+            {
+                return TypePermis;
+
+            }
+            set
+            {
+                TypePermis=value;
+            }
+
+        }
 
 
         //méthode
@@ -151,7 +169,8 @@ namespace projetTeste
         }
         public override string ToString()
         {
-            return "nom: " + nom + "\nprénom: " + prénom + "\n Adresse: " + adresse + "\n Email: " + email;
+            return "nom: " + nom + "\nprénom: " + prénom + "\n Adresse: " + adresse + "\n Email: " + email + "\n Date de naissance" + dateNaissance+
+                 "\n Durée du permis"+agepermis+"\n type permis"+typePermis+"\n Réservé"+reserve;
         }
     }
 }
