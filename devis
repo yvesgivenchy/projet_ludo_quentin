@@ -1,0 +1,38 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace version_1._0
+{
+    class devis
+    {
+        //attribut
+        private commande commande;
+        private double coutTotalHt;
+        private double coutTotalTtc;
+
+        //constructeur
+        public devis (commande commande)
+        {
+            this.commande = commande;
+            coutTotalHt = calculcoutTotalht();
+            coutTotalTtc = coutTotalHt * 1.15;
+        }
+
+        //méthode
+        public double calculcoutTotalht()
+        {
+            double couttotale = 0.0;
+            double coefficient = 1.0;
+            int age = commande.Client.CalculAge();
+            if (age < 30)
+            {
+                coefficient = 1 + ((100 - age) / 100);
+            }
+            couttotale = coefficient * (commande.Vehicule.Tarif * commande.Nbkilometre);
+            return couttotale;
+        }
+    }
+}
