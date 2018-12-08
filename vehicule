@@ -24,17 +24,17 @@ namespace version_1._0
         protected bool[] etatvehicule;
         protected string[] localisation;
         protected string transmission;
+        protected double km=0.0;
 
         //constructeur
 
         public vehicule(string immatriculation, string marque, string modele,
-            int agemin, int dureeminpermis, string carburant, double tarif, int nbplace, string typedepermis, string typeVehicule, string transmission)
+            int agemin, string carburant, double tarif, int nbplace, string typedepermis, string typeVehicule, string transmission)
         {
             this.immatriculation = immatriculation;
             this.marque = marque;
             this.modele = modele;            
-            this.agemin = agemin;
-            this.dureeminpermis = dureeminpermis;
+            this.agemin = agemin;            
             this.carburant = carburant;
             this.tarif = tarif;            
             this.nbplace = nbplace;
@@ -42,6 +42,7 @@ namespace version_1._0
             this.typeVehicule = typeVehicule;
             etatvehicule = new bool[5];
             localisation = new string[2];
+            reserve=false;
 
         }
 
@@ -60,7 +61,18 @@ namespace version_1._0
                 return tarif;
             }
         }
-
+        public double Km
+        {
+            get
+            {
+                return km;
+            }
+            set
+            {
+                km = value;
+            }
+            
+        }
         public int Agemin
         {
             get
@@ -82,6 +94,11 @@ namespace version_1._0
             get
             {
                 return reserve;
+            }
+            set
+            {
+                reserve=value;
+
             }
         }
 
