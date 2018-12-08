@@ -15,13 +15,14 @@ namespace version_1._0
 
         //construteur
         public moto(string immatriculation, string marque, string modele,
-            int agemin, int dureeminpermis, string carburant, double tarif, int nbplace, string typedepermis, 
-            string typeVehicule, int cylindre, int hauteurselle,int puissance, string transmission) :base(immatriculation,marque,modele,agemin,dureeminpermis,carburant,tarif
+            int agemin, string carburant, double tarif, int nbplace, string typedepermis, 
+            string typeVehicule, int cylindre, int hauteurselle,int puissance, string transmission) :base(immatriculation,marque,modele,agemin,carburant,tarif
                 ,nbplace, typedepermis, typeVehicule,transmission)
         {
             this.cylindre = cylindre;
             this.hauteurselle = hauteurselle;
             this.puissance = puissance;
+            dureeminpermis = 1;
         }
 
         //propriete
