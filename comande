@@ -6,33 +6,80 @@ using System.Threading.Tasks;
 
 namespace version_1._0
 {
-    class devis
+    class commande
     {
-        //attribut
-        private commande commande;
-        private double coutTotalHt;
-        private double coutTotalTtc;
+        //attribut        
+        private double nbKilometrage;
+        private vehicule vehicule;
+        private Client client;        
+        private bool autoroute;
+        private string villeDepart;
+        private string villeRetour;
+        private string datedebut;
+        private string datefin;        
+        private bool alleRetour;
 
+        
         //constructeur
-        public devis (commande commande)
+        public commande(double nbKilometrage, vehicule vehicule, Client client, string datedebut, string datefin)
         {
-            this.commande = commande;
-            coutTotalHt = calculcoutTotalht();
-            coutTotalTtc = coutTotalHt * 1.15;
+            this.nbKilometrage = nbKilometrage;
+            this.vehicule = vehicule;
+            this.datedebut = datedebut;
+            this.datefin = datefin;
+            this.client = client;
+           
         }
 
-        //méthode
-        public double calculcoutTotalht()
+        //propriete
+        public Client Client
         {
-            double couttotale = 0.0;
-            double coefficient = 1.0;
-            int age = commande.Client.CalculAge();
-            if (age < 30)
+            get
             {
-                coefficient = 1 + ((100 - age) / 100);
+                return client;
             }
-            couttotale = coefficient * (commande.Vehicule.Tarif * commande.Nbkilometre);
-            return couttotale;
+            set
+            {
+                client = value;
+            }
+
         }
+        public vehicule Vehicule
+        {
+            get
+            {
+                return vehicule;
+            }
+            set
+            {
+                vehicule = value;
+                
+            }
+        }
+        public bool Autoroute
+        {
+            get
+            {
+                return autoroute;
+            }
+            set
+            {
+                autoroute = value;
+            }
+        }
+
+        public double Nbkilometre
+        {
+            get
+            {
+                return nbKilometrage;
+            }
+            set
+            {
+                nbKilometrage = value;
+            }
+        }
+
+
     }
 }
