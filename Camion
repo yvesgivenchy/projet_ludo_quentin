@@ -15,13 +15,14 @@ namespace version_1._0
 
         //consctructeur
         public camion (string immatriculation, string marque, string modele,
-            int agemin, int dureeminpermis, string carburant, double tarif, int nbplace, string typedepermis,
-            string typeVehicule,double poidcharge,string dimmensioncharge,int poid, string transmission) : base(immatriculation, marque, modele, agemin, dureeminpermis, carburant, tarif,
+            int agemin,  string carburant, double tarif, int nbplace, string typedepermis,
+            string typeVehicule,double poidcharge,string dimmensioncharge,int poid, string transmission) : base(immatriculation, marque, modele, agemin, carburant, tarif,
                  nbplace, typedepermis, typeVehicule,transmission)
         {
             this.poid = poid;
             this.poidcharge = poidcharge;
             this.dimmensioncharge = dimmensioncharge;
+            dureeminpermis = 2;
             
 
         }
