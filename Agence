@@ -73,43 +73,7 @@ namespace version_1._0
                  Console.WriteLine(c.ToString());
              }
          }*/
-        public Client IdentificationClient()
-        {
-            
-                Client a = null;
-                Console.WriteLine("Donnez moi le login ");
-                string login = Console.ReadLine();
-
-                Console.WriteLine("Donnez moi le mot de passes");
-                string mdp = Console.ReadLine();
-                Console.Clear();
-                bool teste = false;
-                while (!teste)
-                {
-                    foreach (Client c in ListClient)
-                    {
-                        if (c.Verifcation(login, mdp))
-                        {
-                            teste = true;
-                            a = c;
-                        }
-
-                    }
-                    if (!teste)
-                    {
-                    Console.Clear();
-                        Console.WriteLine("Il semblerait que le mot de passe ou le login donnez ne soit pas bon, veuillez s'il vous plait redonnez ");
-                        login = Console.ReadLine();
-                        mdp = Console.ReadLine();
-                    }
-                }
-            
-                return a;
-            
-           
-
-            
-        }
+        
 
         
         public void AjoutClient(ref  Client A)
@@ -145,36 +109,8 @@ namespace version_1._0
                     
                 }                
             }
-            Console.Clear();
-          
-
-            teste = false;//vérifie le login et mdp
-            string login=null;
-            string mdp=null;
-            while (!teste)
-            {
-                teste = true;
-                Console.WriteLine("Donnez moi votre login");
-                 login = Console.ReadLine();
-                Console.WriteLine("Donnez moi votre mot de passes");
-                 mdp = Console.ReadLine();
-                foreach( Client c in ListClient)
-                {
-                    if (c.Verifcation(login, mdp))
-                    {
-                        
-                        teste = false;
-                    }
-                    
-                }
-                if (!teste)
-                {
-                    Console.Clear();
-                    Console.WriteLine("Il semblerait que le mot de passe ou le login donnez  soit déjà prit, veuillez s'il vous plait en donnez un nouveau ");
-                                     
-                }
-                
-            }
+            Console.Clear();       
+                     
             Console.WriteLine("Donnez moi votre date de naissance sous le format j/m/a");
             Console.WriteLine("jour");
             string jour = Console.ReadLine();
@@ -191,7 +127,7 @@ namespace version_1._0
             string typePermis=Console.ReadLine();
 
 
-            A = new Client(nom, prénom, adresse, login, mdp,email,dateNaissance, obtentionpermis,typePermis);
+            A = new Client(nom, prénom, adresse,email,dateNaissance, obtentionpermis,typePermis);
             ListClient.Add(A);
             Console.WriteLine(A.Identifiant);
             
@@ -199,8 +135,7 @@ namespace version_1._0
         public void ModifcationClient(Client a)
         {
             Console.Clear();
-            Console.WriteLine(a.ToString());
-            Console.WriteLine("login: " + a.Login + " \nmot de passe: " + a.Mdps);
+            Console.WriteLine(a.ToString());            
             Console.WriteLine();
             Console.WriteLine("Que voulez vous modifiez?");
             bool teste = false;
@@ -208,8 +143,8 @@ namespace version_1._0
             do
             {
                 choix = 50;
-                string annonce="1. Nom  2.Prénom 3.Adresse 4.Login/mdp ";
-                while(choix>4|| choix < 1)
+                string annonce="1. Nom  2.Prénom 3.Adresse ";
+                while(choix>3|| choix < 1)
                 {
                     choix =SecuriteSaisieNombreINT(annonce);
                 }
@@ -253,41 +188,7 @@ namespace version_1._0
                         } while (!verif);
                         a.Adresse = adresse;
 
-                        break;
-
-                    case 4 :
-
-                        Console.Clear();
-                        Console.WriteLine("Donnez moi le nouveau login et mdp");
-                        string login = Console.ReadLine();
-                        string mdp = Console.ReadLine();
-                        bool option = true;
-                        do
-                        {
-                            Console.Clear();
-                            
-                            login = Console.ReadLine();
-                            mdp = Console.ReadLine();
-                            foreach (Client c in ListClient)
-                            {
-                                if (c.Login == login && c.Mdps == mdp)
-                                {
-
-                                        option = false;
-                                    
-                                }
-                            }
-                            if (!option)
-                            {
-                                Console.WriteLine("Veuillez nous redonnez un nouveau login et mdp");
-                                login = Console.ReadLine();
-                                mdp = Console.ReadLine();
-
-                            }
-                        } while (!option);
-                        a.Login = login;
-                        a.Mdps = mdp;
-                        break;
+                        break;                  
                         
 
                     default:
@@ -361,39 +262,7 @@ namespace version_1._0
 
         public vehicule ChoixVoiture(List<vehicule> listVoitureCritere, int choix, Contrat c)// prgramme Main pour la modification voiture
         {
-            /* Console.Clear();
-             Console.WriteLine("Dites moi quel sont vos critère");
-             Console.WriteLine("Pour le type de véhicule");
-             Console.WriteLine("0.\n rien 1.Berline\n2.Break\n3.SUV\n4.Monospace\n5.Voiture de Sport");
-                 int opt = int.Parse(Console.ReadLine());
-             do
-             {
-                 opt = int.Parse(Console.ReadLine());
 
-             }while (!verification(opt, 0, 5));
-
-             switch (opt)
-             {
-                 case 0:
-
-                 break;
-                 case 1:
-                     typeVehicule = "berline";
-
-                     break;
-                 case 2:
-                     typeVehicule="break";
-                     break;
-                 case 3:
-                     typeVehicule = "SUV";
-                     break;
-                 case 4:
-                     typeVehicule = "monospace";
-                     break;
-                 case 5 :
-                     typeVehicule = "voitureSport";
-                     break;
-             }*/
 
             Client f= c.Client;
             vehicule l=null;
@@ -532,7 +401,8 @@ namespace version_1._0
         {        
             int i=0;
             foreach (vehicule l in listVehicule)
-            { 
+            { if(!l.Reserve)
+            {
                 if(choix==1 && l is voiture|| choix==2 && l is moto || choix==3 && l is camion)
                 {
                     if (typeVehicule != null && transmission != null)
@@ -573,6 +443,7 @@ namespace version_1._0
 
                     }
                 }
+            }
 
 
             }
@@ -683,7 +554,9 @@ namespace version_1._0
             Console.Clear();
             List<vehicule> listVoitureCritére = new List<vehicule>(listVehicule.Count);
             bool teste = c.Reserve;
-            Contrat contrat = null;
+            Contrat contrat=null; 
+            vehicule v= null;
+            vehicule v2;
             if (teste)
             {
                 foreach(Contrat C in ListContrat)
@@ -694,7 +567,7 @@ namespace version_1._0
                     }
                 }
                 Console.WriteLine("Vous avez un vehicule");
-                vehicule v = contrat.Vehicule;
+                 v = contrat.Vehicule;
                 Console.WriteLine(v.ToString());
                 Console.WriteLine("Que voulez vous faire?");
                 Console.WriteLine("1.Modifiez la voiture\n 2.Modifiez le nb de kilométrage\n");// choix de modification
@@ -720,18 +593,17 @@ namespace version_1._0
                             case 1:
                                 if (v is voiture)// si il avait déjà une voiture
                                 { 
+                                    ChangmentReserve(v);
                                     v=ChoixVoiture(listVoitureCritére, choix, contrat);
-                                    contrat.Vehicule=v;
-                                    contrat.CouTotal();
-                                    
+                                    contrat.Vehicule=v;        
                                 }
                                 else
                                 {
                                     if(c.TypePermis=="B"||c.TypePermis=="BE")
                                     {
+                                        ChangmentReserve(v);
                                        v= ChoixVoiture(listVoitureCritére,choix,contrat);
-                                       contrat.Vehicule=v;
-                                       
+                                       contrat.Vehicule=v;                                      
                                     }
                                     else
                                     {
@@ -740,13 +612,17 @@ namespace version_1._0
                                 }
                                 break;
                                 case 2:
-                                  
-                                    
-                                        if(c.TypePermis=="A1"||c.TypePermis=="A2")
+                                        if (v is moto)// si il avait déjà une voiture
+                                        { 
+                                           ChangmentReserve(v);
+                                            v=ChoixVoiture(listVoitureCritére, choix, contrat);
+                                            contrat.Vehicule=v;                                                                       
+                                        }                     
+                                        else if(c.TypePermis=="A1"||c.TypePermis=="A2")
                                         {
-                                        v=ChoixVoiture(listVoitureCritére,choix,contrat);
-                                        contrat.Vehicule=v;
-                                        
+                                            ChangmentReserve(v);
+                                            v=ChoixVoiture(listVoitureCritére,choix,contrat);
+                                            contrat.Vehicule=v;                                      
                                         }
                                         else
                                         {
@@ -756,16 +632,18 @@ namespace version_1._0
                                 break;
                                 case 3 :
                                 if(v is camion)
-                                {
-                                    ChoixVoiture(listVoitureCritére,choix,contrat);
+                                    {
+                                        ChangmentReserve(v);
+                                        v= ChoixVoiture(listVoitureCritére,choix,contrat);
+                                        contrat.Vehicule=v;                                       
                                     }
                                     else
                                     {
                                         if(c.TypePermis=="C"||c.TypePermis=="C1"|| c.TypePermis=="C1E")
                                         {
-                                        ChoixVoiture(listVoitureCritére,choix,contrat);
-                                        contrat.Vehicule=v;
-                                        
+                                           ChangmentReserve(v);
+                                            v=ChoixVoiture(listVoitureCritére,choix,contrat);
+                                            contrat.Vehicule=v;
                                         }
                                         else
                                         {
@@ -774,11 +652,15 @@ namespace version_1._0
                                     }                 
                                 break;
 
+                               
+
                         }
                     
                     break;
-
-                    case 2:
+                    case 2:// cas ou il veut modifier son kilométrage
+                    Console.WriteLine("Donnez moi le nouveau kilométrage");
+                    double nbKilom=Double.Parse(Console.ReadLine());
+                    contrat.NbKilometrage=nbKilom;
                     break;
                 }
                 int i=0;
@@ -793,6 +675,140 @@ namespace version_1._0
                 
                 
             }
+            else                // si il n'a pas de voiture
+            {
+            Console.WriteLine("Vous n'avez pas de contrat");
+            Console.WriteLine("Donnez moi le type de vehicule que vous voulez prendre:\n1.Voiture\n2.Moto\n3.Camion");
+            int option ;
+            do
+            {
+                option= int.Parse(Console.ReadLine());
+
+            }while(!verification(option,1,3));
+            Console.WriteLine();
+            switch(option)
+            {
+                case 1:
+                {
+                    if(c.TypePermis=="B"||c.TypePermis=="BE")
+                    {
+                        v= ChoixVoiture(listVoitureCritére,option,contrat);                        
+                    }
+                    else
+                    {
+                        Console.WriteLine("Vous n'avez pas le type de permis requis, Nous vous renvoyons au menu client");                                       
+                    }  
+                }
+                break;
+                case 2:
+                {
+                    if(c.TypePermis=="A1"||c.TypePermis=="A2")
+                    {
+                        v=ChoixVoiture(listVoitureCritére,option,contrat);                    
+                    }
+                    else
+                    {
+                        Console.WriteLine("Vous n'avez pas le type de permis requis, Nous vous renvoyons au menu client");                                       
+                    }   
+                }
+                break;
+                case 3:
+                {
+                 if(c.TypePermis=="C"||c.TypePermis=="C1"|| c.TypePermis=="C1E")
+                    {
+                        v=ChoixVoiture(listVoitureCritére,option,contrat);                   
+                    }
+                    else
+                    {
+                        Console.WriteLine("Vous n'avez pas le type de permis requis, Nous vous renvoyons au menu client");                                       
+                    }   
+                }break;
+                default:
+                {
+
+                } break;
+
+            }
+            Console.WriteLine("Donnez moi le nombre kilométre à parcourir");
+            double nbKilom= Double.Parse(Console.ReadLine());
+            double Coutotal=0;
+            Console.WriteLine("Donnez moi la date du début du contrat en jour, mois année");// sécurisation date à faire
+            string dateDebut;
+            do
+            {
+             dateDebut= date();
+            }while(dateVerif(dateDebut));
+            Console.WriteLine("Donnez moi la date de la fin du contrat");
+            string dateFin= date();
+            v.Reserve=true;
+            Contrat c2 = new Contrat(nbKilom,v,c,dateDebut,dateFin);
+            listContrat.Add(c2);
+
+            
+
+            }
+        }
+        public string date()
+        {
+            Console.WriteLine("Donnez moi d'abord le mois"):
+            string mois;
+            
+            int moi;
+            do
+            {
+                mois=Console.ReadLine();
+                moi =Convert.ToInt32(mois);
+
+            }while(!verification(moi,1,12));
+            
+            Console.WriteLine("Donnez moi le jour");            
+            string jour;
+            if(mois=="2")
+            {
+                do
+                {
+                    jour=Console.ReadLine();
+                }while(verification(Convert.ToInt32(jour),1,28));
+
+            }
+            else if(moi!=2 &&moi<=7&&moi%2==0)
+            {
+                do
+                {
+                    jour=Console.ReadLine();
+
+                }while(verification(Convert.ToInt32(jour),1,30));
+            }
+            else if(moi!=2 &&moi<=7&&moi%2!=0)
+            {
+                do
+                {
+                    jour=Console.ReadLine();
+
+                }while(verification(Convert.ToInt32(jour),1,31));
+
+            }
+            else if(moi>=8&&moi%2==0)
+            {
+                do
+                {
+                    jour=Console.ReadLine();
+
+                }while(verification(Convert.ToInt32(jour),1,31));
+            }
+            else
+            {
+                do
+                {
+                    jour=Console.ReadLine();
+
+                }while(verification(Convert.ToInt32(jour),1,30));
+
+            }
+            Console.WriteLine("Donnez moi l'année");            
+            string année= Console.ReadLine();
+            return jour+"/"+mois+"/"+année;
+
         }
         
         public void AffichageTotale()
@@ -810,6 +826,29 @@ namespace version_1._0
             return teste;
 
         }
+        public bool dateVerif(string dateDebut)
+        {
+            string[] dateDEbut=dateDebut.Split('/');
+            bool teste=true;
+            DateTime date = DateTime.Today;
+            string nom = Convert.ToString(date);
+            string[] tab = nom.Split(' ');            
+            string[] aujourdhui = tab[0].Split('/');
+            if(Convert.ToInt32(aujourdhui[2])>Convert.ToInt32(dateDEbut[2]))
+            {
+                teste=false;
+                
+            }else if(Convert.ToInt32(aujourdhui[1])>Convert.ToInt32(dateDEbut[1]))
+            {
+                teste=false;
+                
+            }else if(Convert.ToInt32(aujourdhui[0])>Convert.ToInt32(dateDEbut[]))
+            {
+                teste=false;
+
+            }
+            return teste;
+        }
 
         public bool ExistenceVehicule(string immat)
         {
@@ -824,6 +863,18 @@ namespace version_1._0
             }
 
             return res;
+        }
+        public void ChangmentReserve(vehicule v)
+        {
+            foreach (vehicule c in listVehicule)
+            {
+                if (c.Immatriculation == v.Immatriculation)
+                {
+                    c.Reserve=false;
+                }
+
+            }
+
         }
 
 
@@ -878,7 +929,7 @@ namespace version_1._0
 
         public void AjoutVoiture(string immatriculation)
         {
-            string marque; string modele; int agemin; int dureeminpermis; string carburant;
+            string marque; string modele; int agemin;  string carburant;
             double tarif; int nbplace; string typedepermis; int nbporte; bool climatisation = false;
             string transmission = ""; int capacite; string typeVehicule;
             Console.WriteLine("Quel est le type de la voiture ?");
@@ -890,9 +941,7 @@ namespace version_1._0
             string annonce = "Quel l'âge minimum pour conduire ce vehicule ?";            
             agemin = SecuriteSaisieNombreINT(annonce);
             Console.WriteLine("Quel est le carburant de la voiture ?");
-            carburant = Console.ReadLine();            
-            annonce = "Qu'elle est la durée minimum d'optention du permis pour cette voiture ?";            
-            dureeminpermis = SecuriteSaisieNombreINT(annonce);            
+            carburant = Console.ReadLine();                   
             annonce = "Quel est le tarif pour cette voiture ?";           
             tarif = SecuriteSaisieNombreDOUBLE(annonce);            
             annonce = "Combien de place possède cette voiture?";            
@@ -953,7 +1002,7 @@ namespace version_1._0
             }            
             annonce = "Combien de bagage la voiture peut contenir ?";            
             capacite = SecuriteSaisieNombreINT(annonce);
-            voiture a = new voiture(immatriculation, marque, modele, agemin, dureeminpermis, carburant, tarif,
+            voiture a = new voiture(immatriculation, marque, modele, agemin, carburant, tarif,
                 nbplace, typedepermis, nbporte, climatisation, capacite, typeVehicule, transmission);
             listVehicule.Add(a);
 
@@ -963,7 +1012,7 @@ namespace version_1._0
         public void AjoutMoto(string immatriculation)
         {
             string marque; string modele; string annonce = "";
-            int agemin; int dureeminpermis; string carburant; double tarif; int nbplace; string typedepermis;
+            int agemin; string carburant; double tarif; int nbplace; string typedepermis;
             string typeVehicule; int cylindre=0; int hauteurselle=0; int puissance=0; string transmission="";
             Console.WriteLine("Quel est le type de la moto?");
             typeVehicule = Console.ReadLine();
@@ -974,9 +1023,7 @@ namespace version_1._0
             annonce = "Quel l'âge minimum pour conduire ce vehicule ?";            
             agemin = SecuriteSaisieNombreINT(annonce);
             Console.WriteLine("Quel est le carburant de la moto ?");
-            carburant = Console.ReadLine();            
-            annonce = "Qu'elle est la durée minimum d'optention du permis pour cette moto ?";            
-            dureeminpermis = SecuriteSaisieNombreINT(annonce);            
+            carburant = Console.ReadLine();                       
             annonce = "Quel est le tarif pour cette moto?";            
             tarif = SecuriteSaisieNombreDOUBLE(annonce);            
             annonce = "Combien de place possède cette moto?";            
@@ -1015,7 +1062,7 @@ namespace version_1._0
             annonce = "Qu'elle est la hauteur de la selle de cette moto(en cm)?";            
             hauteurselle = SecuriteSaisieNombreINT(annonce);
 
-            moto a = new moto(immatriculation, marque, modele, agemin, dureeminpermis, carburant, tarif,
+            moto a = new moto(immatriculation, marque, modele, agemin, carburant, tarif,
                 nbplace, typedepermis,typeVehicule,cylindre,hauteurselle,puissance,transmission );
             listVehicule.Add(a);
 
@@ -1025,7 +1072,7 @@ namespace version_1._0
         public void AjoutCamion(string immatriculation)
         {
             string marque; string modele; string annonce = "";
-            int agemin; int dureeminpermis; string carburant; double tarif; int nbplace; string typedepermis;
+            int agemin; string carburant; double tarif; int nbplace; string typedepermis;
             string typeVehicule; double poidcharge=0.0; string dimmensioncharge=""; int poid=0; string transmission="";
             
             Console.WriteLine("Quel est le type du camion?");
@@ -1037,9 +1084,7 @@ namespace version_1._0
             annonce = "Quel l'âge minimum pour conduire ce vehicule ?";            
             agemin = SecuriteSaisieNombreINT(annonce);
             Console.WriteLine("Quel est le carburant du camion ?");
-            carburant = Console.ReadLine();            
-            annonce = "Qu'elle est la durée minimum d'optention du permis pour ce camion ?";            
-            dureeminpermis = SecuriteSaisieNombreINT(annonce);            
+            carburant = Console.ReadLine();                       
             annonce = "Quel est le tarif pour ce camion?";            
             tarif = SecuriteSaisieNombreDOUBLE(annonce);            
             annonce = "Combien de place possède ce camion?";            
@@ -1084,7 +1129,7 @@ namespace version_1._0
             annonce = "Quel est le poid du camion (en kg) ?";            
             poid = SecuriteSaisieNombreINT(annonce);
 
-            camion a = new camion(immatriculation, marque, modele, agemin, dureeminpermis, carburant, tarif,
+            camion a = new camion(immatriculation, marque, modele, agemin, carburant, tarif,
                 nbplace, typedepermis, typeVehicule,poidcharge,dimmensioncharge,poid,transmission );
             listVehicule.Add(a);
 
@@ -1097,7 +1142,7 @@ namespace version_1._0
             int cpt = 0;
             Console.WriteLine("Entrez l'immatriculation du véhicule que vous souhaitez consulter");
             string str = Console.ReadLine();
-            while (cpt <= listVehicule.Count && res == false)
+            while (cpt <= listVehicule.Count-1 && res == false)
             {
                 v = listVehicule[cpt];
                 if (v.Immatriculation == str)
@@ -1148,7 +1193,7 @@ namespace version_1._0
             int cpt = 0;
             Console.WriteLine("Entrez l'immatriculation du véhicule à supprimer");
             string str = Console.ReadLine();            
-            while (cpt <= listVehicule.Count && res == false)
+            while (cpt <= listVehicule.Count-1 && res == false)
             {
                 v = listVehicule[cpt];
                 if (v.Immatriculation == str)
