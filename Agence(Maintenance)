@@ -1,0 +1,147 @@
+ class Agence: Imaintenance
+    {
+        private List<vehicule> listvehicule;
+        bool[,] mat = new bool[21, 10];
+        public void Remplissage(bool[,] mat)// on utilise cette méthode au début du programme.cs afin de savoir quelle place sont déjà prise
+        {
+            for(int i = 0; i < mat.GetLength(0); i++)
+            {
+                for(int j = 0; j < mat.GetLength(1); j++)
+                {
+                    foreach( vehicule c in listvehicule)
+                    {
+                        string[] localisation= c.Localisation;
+                        if (i == Int32.Parse(localisation[0]) && j == Int32.Parse(localisation[0])) mat[i, j] = true;
+                        else mat[i, j] = false;
+
+                    }
+
+                }
+            }
+        }
+        
+        public void StationementVehicule(bool[,] mat, vehicule V, string[]position)// La variabl poition sera nul si on vient de crée un véhicule mais sera rempli quand le client rendra le véhicule
+        {
+            if (position == null)
+            {
+                for (int i = 0; i < mat.GetLength(0); i++)
+                {
+                    for (int j = 0; j < mat.GetLength(1); j++)
+                    {
+                        if (!mat[i,j])
+                        {
+                            position[0] = Convert.ToString(i);
+                            position[1] = Convert.ToString(j);
+                            Console.WriteLine("La voiture à été garée dans le parking numéro"+position[0]+"à la place numéro A"+position[1]);
+                            mat[i, j] = true;
+                            V.Localisation = position;
+                            // appellée le menu
+                        }
+
+                    }
+                }
+
+            }
+            else
+            {
+                int i = Int32.Parse(position[0]);
+                int j=Int32.Parse(position[1]);
+                if (!mat[i, j])
+                {
+                    mat[i, j] = true;
+                    V.Localisation = position;
+                    Console.WriteLine("La voiture à été garée dans le parking numéro" + position[0] + "à la place numéro A" + position[1]);
+                    // appellée le menuMaintenance
+                }
+                else
+                {
+                    Console.WriteLine("Ils sembleraient que la positin donnée par le client ne soit pas bonne voulez vous recommencez ou voulez vous que je vous donne les places disponibles?");
+                    Console.WriteLine("0.Recommencez     1.Indiquez les positions");
+                    int option = int.Parse( Console.ReadLine());
+                    if (option == 0)
+                    {
+                        do
+                        {
+                            Console.WriteLine("Donnez moi le numéro de parking");
+                            int parking = int.Parse(Console.ReadLine());
+                            Console.WriteLine("Donnez moi le numéro de la place");
+                            int place = int.Parse(Console.ReadLine());
+                            if (!VerificationPlace(mat, parking, place))
+                            {
+                                mat[parking, place] = true;
+                                position[0] = Convert.ToString(parking);
+                                position[1] = Convert.ToString(place);
+                                V.Localisation = position;
+                                Console.WriteLine("La voiture à été garée dans le parking numéro" + position[0] + "à la place numéro A" + position[1]);
+                                // appellée le menuMaintenance
+                            }
+                            else
+                            {
+                                Console.WriteLine("La place que vous m'avez donnée n'est toujours pas bonne voulez vous recommencez? ou voulez avoir les places disponibles");
+                                option =int.Parse( Console.ReadLine());
+                                if(option==1) IndiquezPlace(mat, V, position);
+                            }
+                        } while (option == 0);
+
+                    }
+                    else
+                    {
+                        IndiquezPlace(mat, V, position);
+                    }
+
+                }
+
+            }
+
+
+        }
+        public void IndiquezPlace(bool[,] mat, vehicule V, string[] position)
+        {
+            int[] tab = new int[21];
+            int w = 0;
+            int i;
+            for ( i= 0; i < mat.GetLength(0); i++)
+            {
+                for (int j = 0; j < mat.GetLength(1); j++)
+                {
+                    if (!mat[i,j]) w++;
+
+                }
+                tab[i] = w;
+                w = 0;
+            }
+            for (i = 0; i < tab.Length; i++)
+            {
+                Console.WriteLine("Dans le parking numéro" + i + 1 + "il reste" + tab[i]);
+            }
+            Console.WriteLine("Donnez moi le parking que vous voulez ");
+            int parking = int.Parse(Console.ReadLine());
+            bool teste = false;
+            for(int k = 0; k < mat.GetLength(1); k++)
+            {
+                if (!mat[parking, k])
+                {
+                    mat[parking, k] = true;
+                    position[0] = Convert.ToString(parking);
+                    position[1] = Convert.ToString(k);
+                    V.Localisation = position;
+                    teste = true;
+                    Console.WriteLine("La voiture à été garée dans le parking numéro" + position[0] + "à la place numéro A" + position[1]);
+                    //RetourMenuMaintenance
+                }
+            }
+            if (!teste)
+            {
+                Console.WriteLine("LA place donnée n'est toujours pas bonne nous devons recommencez");
+                IndiquezPlace(mat, V, position);
+            }
+
+        }
+        public bool VerificationPlace(bool[,]mat, int i, int j)
+        {
+            bool teste = true;
+            if (!mat[i, j]) teste = false;
+            return teste;
+
+        }
+    }
