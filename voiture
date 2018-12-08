@@ -15,14 +15,15 @@ namespace version_1._0
 
         //constructeur
         public voiture(string immatriculation, string marque, string modele,
-            int agemin, int dureeminpermis, string carburant, double tarif, int nbplace, string typedepermis,
-            int nbporte,bool climatisation,int capacite,string typeVehicule, string transmission) :base(immatriculation,marque,modele,agemin,dureeminpermis,
+            int agemin, string carburant, double tarif, int nbplace, string typedepermis,
+            int nbporte,bool climatisation,int capacite,string typeVehicule, string transmission) :base(immatriculation,marque,modele,agemin,
                 carburant,tarif,nbplace,typedepermis,typeVehicule,transmission)
         {
             this.nbporte = nbporte;
             this.climatisation = climatisation;
             this.transmission = transmission;
-            this.capacite = capacite;                        
+            this.capacite = capacite;
+            dureeminpermis = 1;
             
         }
 
