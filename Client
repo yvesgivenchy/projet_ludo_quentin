@@ -9,14 +9,12 @@ namespace version_1._0
     class Client
     {
         //attribut
-        static int nbClient;
-        private string logins;
+        static int nbClient;        
         private string prenom;
         private string nom;
         private string dateNaissance;
         private string adresse;
-        private string email;
-        private string mdps;
+        private string email;        
         private bool reserve;
         private int identifiant;
         private int obtentionpermis;
@@ -24,14 +22,13 @@ namespace version_1._0
         public string typePermis;
         
 
-        public Client (string nom, string prenom,string adresse,string login, string mdp, string email, string dateNaissance, int obtentionpermis,string typePermis)
+        public Client (string nom, string prenom,string adresse, string email, string dateNaissance, int obtentionpermis,string typePermis)
         {
-            this.logins = login;
+           
             this.nom = nom;
             this.prenom = prenom;
-            this.adresse = adresse;
-            this.logins = login;
-            this.mdps = mdp;
+            this.adresse = adresse;            
+            
             this.email = email;
             this.typePermis=typePermis;
             reserve = false;
@@ -44,17 +41,7 @@ namespace version_1._0
         }
 
         //Propriété
-        public string Login
-        {
-            get
-            {
-                return logins;
-            }
-            set
-            {
-                logins = value;
-            }
-        }
+        
         public string Nom
         {
             get
@@ -74,7 +61,7 @@ namespace version_1._0
             }
             set
             {
-                prénom = value;
+                prenom = value;
             }
         }
         public string Adresse
@@ -88,17 +75,7 @@ namespace version_1._0
                 adresse = value;
             }
         }
-        public string Mdps
-        {
-            get
-            {
-                return mdps;
-            }
-            set
-            {
-                mdps = value;
-            }
-        }
+       
         public int Identifiant
         {
             get
@@ -157,19 +134,10 @@ namespace version_1._0
             return age;
 
         }
-        public bool Verifcation(string login, string  mdp)// cette méthode sera utilisé afin d'idetnifier le client ainsi on simplifiera le code d' Agence
-        {
-            bool teste=false;
-            if (logins==login && mdps==mdp)
-            {
-                teste = true;
-            }
-            return teste;
-
-        }
+        
         public override string ToString()
         {
-            return "nom: " + nom + "\nprénom: " + prénom + "\n Adresse: " + adresse + "\n Email: " + email + "\n Date de naissance" + dateNaissance+
+            return "nom: " + nom + "\nprénom: " + prenom + "\n Adresse: " + adresse + "\n Email: " + email + "\n Date de naissance" + dateNaissance+
                  "\n Durée du permis"+agepermis+"\n type permis"+typePermis+"\n Réservé"+reserve;
         }
     }
