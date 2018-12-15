@@ -9,19 +9,74 @@ namespace version_1._0
     class devis
     {
         //attribut
+        static int id = 0;
+        private int numDevis;
         private commande commande;
         private double coutTotalHt;
         private double coutTotalTtc;
+        private bool validation;
 
         //constructeur
         public devis (commande commande)
         {
             this.commande = commande;
+            validation = false;
             coutTotalHt = calculcoutTotalht();
             coutTotalTtc = coutTotalHt * 1.15;
+            id++;
+            numDevis = id;
         }
 
         //méthode
+        public  int NumDevis
+        {
+            get
+            {
+                return numDevis;
+            }
+
+        }
+        public commande Commande
+        {
+            get
+            {
+                return commande;
+            }
+            set
+            {
+                commande = value;
+                coutTotalHt = calculcoutTotalht();
+                coutTotalTtc = calculcoutTotalht() * 1.15;
+            }
+        }
+        public double CoutTotalHt
+        {
+            get
+            {
+                return coutTotalHt;
+            }
+            
+        }
+
+        public double CoutTotalTtc
+        {
+            get
+            {
+                return coutTotalTtc;
+            }
+        }
+
+        public bool Validation
+        {
+            get
+            {
+                return validation;
+            }
+            set
+            {
+                validation = value;
+            }
+        }
         public double calculcoutTotalht()
         {
             double couttotale = 0.0;
@@ -33,6 +88,12 @@ namespace version_1._0
             }
             couttotale = coefficient * (commande.Vehicule.Tarif * commande.Nbkilometre);
             return couttotale;
+        }
+
+        public override string ToString()
+        {
+            return "Véhicule \n"+commande.Vehicule.AffichageVehiculeclient()+"\n Prix HT : "+coutTotalHt+
+                "\n TVA:"+coutTotalHt*0.15+"\n Prix TTC :" + coutTotalTtc;
         }
     }
 }
