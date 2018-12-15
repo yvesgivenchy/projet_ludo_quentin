@@ -15,14 +15,21 @@ namespace version_1._0
             Client c = new Client("Chevallier", "Ludovic", "Meudon","ludobite.chatte@niqueur.fr","29/09/2019",2000,"B");
             voiture v = new voiture("i5-85-85", "Mercedes", "clase a", 25, "diesel", 1.5, 4, "A", 4, true, 2, "Berline", "Automatique");
             voiture v1 = new voiture("e2-98-ea", "Renault", "megane", 18, "essence", 1.0, 4, "B", 5, true, 3, "citadine", "Manuelle");
-            Contrat c1 = new Contrat(35, v, c, 120);
+            commande cc = new commande(800, v, c, true, "paris", "marseille", "15/12/2018", "15/12/2018", false);
+            devis d = new devis(cc);
+            Contrat co = new Contrat(d);
             Maintenance m = new Maintenance();
             Agence agence = new Agence(m,"b","mdp");
             agence.ListVehicule.Add(v);
             agence.ListVehicule.Add(v1);
             agence.ListClient.Add(c);
-            agence.ListContrat.Add(c1);
-            c.Reserve = true;
+            agence.ListContrat.Add(co);
+            string[] l = { "0", "0" };
+            v.Localisation = l;
+            string[] l2 = { "0", "1" };
+            v1.Localisation = l2;
+
+
             Console.WriteLine("Bonjour Monsieur/Madame bienvenue à l'agence Lutin! Que voulez vous faire?");
             Menu(agence);
 
@@ -48,41 +55,13 @@ namespace version_1._0
             while (choix > 2 || choix < 1)
             {
 
-                string annonce="1.Identifcation client\n2.Identification agence\n3.Affichage total";
+                string annonce="1.Identification agence \n2.Affichage total";
                 choix = agence.SecuriteSaisieNombreINT(annonce);
             }
             switch (choix)
             {
-                case 1:// Identification client
-                    Console.Clear();
-                    Console.WriteLine("Avez vous un compte?");
-                    int option = 52;
-                    while (option > 1 || option < 0)
-                    {
-                        string annonce="0.Non 1.Oui";
-                        option = agence.SecuriteSaisieNombreINT(annonce);
-                    }
-                    if (option == 1)// Compte existant
-                    {
-                        Console.Clear();
-                        Console.WriteLine("Nous allons commencez par une identification");
-                        Client a = agence.IdentificationClient();
-                        Console.WriteLine("Etes vous bien :");
-                        Console.WriteLine(a.ToString());
-
-                        MenuClient(a, agence);
-                    }
-                    else//Création de compte
-                    {
-                        Console.Clear();
-                        Client a = null;
-                        agence.AjoutClient(ref a);
-
-                        MenuClient(a, agence);
-                    }
-
-                    break;
-                case 2://identification agence
+                
+                case 1://identification agence
                     Console.Clear();
                     int i = 0;
                     int j = 3;
@@ -91,7 +70,7 @@ namespace version_1._0
                     string login = Console.ReadLine();
                     Console.WriteLine("Veuillez entrez votre mot de passe");
                     string mdp = Console.ReadLine();                    
-                    if (IdentificationAgence(login,mdp,agence)==false )
+                    if (IdentificationAgence(login,mdp,agence)==false)
                     {
                         do
                         {
@@ -126,7 +105,7 @@ namespace version_1._0
                     break;
                     
 
-                case 3:// Affichage totale
+                case 2:// Affichage totale
                     agence.AffichageTotale();
                     Menu(agence);
                     break;
@@ -140,21 +119,24 @@ namespace version_1._0
         {           
             Console.Clear();
             Console.WriteLine("Bienvenue, \n Que voulez vous faire ?");            
-            string annonce = "1. Ajoutez un véhicule \n2. Supprimez un véhicule \n3. Afficher un véhicule \n4. Rechercher un client \n5. Retour menu principal";            
+            string annonce = "1. Client \n2. Ajoutez un véhicule \n3. Supprimez un véhicule \n4. Afficher un véhicule \n5. Rechercher un client \n6. Retour menu principal\n 7.Maintenance";            
             int choix = agence.SecuriteSaisieNombreINT(annonce);
             bool menuver = false;
-            menuver = agence.verification(choix, 1, 5);
+            menuver = agence.verification(choix, 1, 7);
             while (menuver == false)
             {
                 Console.Clear();
                 choix = agence.SecuriteSaisieNombreINT(annonce);
-                menuver = agence.verification(choix, 1, 5);
+                menuver = agence.verification(choix, 1, 7);
 
             }
 
             switch (choix)
             {
                 case 1:
+                    MenuC(agence);
+                    break;
+                case 2:
                     Console.Clear();
                     agence.AjoutVehicule();
                     Console.WriteLine("Véhicule ajouté");
@@ -162,53 +144,161 @@ namespace version_1._0
                     Console.ReadKey();
                     MenuEmployer(agence);
                     break;
-                case 2:
+                case 3:
                     Console.Clear();
                     agence.SupprimerVehicule();
                     Console.WriteLine("Cliquez sur espace pour etre rediriger vers le menu des employers");
                     Console.ReadKey();
                     MenuEmployer(agence);
                     break;
-                case 3:
+                case 4:
                     Console.Clear();
                     agence.Affichervehicule();
                     Console.WriteLine("Cliquez sur espace pour etre rediriger vers le menu des employers");
                     Console.ReadKey();
                     MenuEmployer(agence);
                     break;
-                case 4:
+                case 5:
                     agence.AfficherClient();
                     Console.WriteLine("Veuillez appuyer sur espace pour etre rediriger vers le menu des employers");
                     Console.ReadKey();
                     MenuEmployer(agence);
                     break;
-                case 5:
+                case 6:
                     Console.Clear();
                     Menu(agence);
-                    break;                    
+                    break; 
+                case 7:
+                    MenuMaintenance(agence);
+                    break;                  
 
                 default:
                     Console.WriteLine("Erreure");
                     break;
             }
         }
+        static void MenuMaintenance(Agence agence)
+        {
+            bool[,] mat = new bool[21, 10];
+            agence.Remplissage(ref mat);
+            string[] position = null;
+
+
+            List<Contrat> listContratPerime= new List<Contrat>(agence.ListContrat.Count);
+            agence.AffichageContratPerime(ref listContratPerime);
+            if(listContratPerime!=null)
+            {
+                Console.WriteLine("Ils s'embleraient que certain contrat ont atteint leurs date limite");
+
+            }
+            
+
+            string annonce= "Que voulez vous faire?\n 1.Stationner un véhicule \n2. Indiquez le véhicule au client 3.Réparez un véhicule";            
+            int option=0 ;
+            do
+            {
+                option = agence.SecuriteSaisieNombreINT(annonce);
+            }while(!agence.verification(option,1,3));
+            switch(option)
+            {
+                case 1:
+                foreach(Contrat c in listContratPerime)
+                {
+                        Console.WriteLine("voici le contrat périmé");
+                        Console.WriteLine(c.Devis.Commande.ToString());
+                        annonce = "Avez vous reçu un mail concernant la position de la voiture?\n 0.Non 1.Oui";
+                        int choix = 0; ;
+                        do
+                        {
+                            choix = agence.SecuriteSaisieNombreINT(annonce);
+                        } while (!agence.verification(choix, 0, 1));
+                        if (choix == 0)
+                        {
+                            agence.AlerteClient(c.Devis.Commande.Client, c.Devis.Commande.Vehicule);
+                        }
+                        else
+                        {
+                            do
+                            {
+                                Console.WriteLine("Donnez moi la place");
+                                string place = Console.ReadLine();
+                                Console.WriteLine("Donnez moi le parking");
+                                string parking = Console.ReadLine();
+                                 position = new string[2];
+                                position[0] = parking;
+                                position[1] = place;
+
+                            } while (!agence.VerificationPlace(mat, position));
+                            vehicule v = c.Devis.Commande.Vehicule;// <=Regarde sa et ose moi me dire que c'est mieux
+                            Client k = c.Devis.Commande.Client;
+                            agence.StationementVehicule(mat, v, position);
+                            agence.AjoutVoitureToMaintenance(v);
+                            //agence.ModificationClientVoiture(v,k);
+
+                        }
+
+
+
+                }
+                    break;
+                case 2:
+                    agence.EnvoiePositionClient();
+                    Menu(agence);
+                    break;
+                case 3:
+                    agence.AjoutVehiculeToControleur();
+                    agence.MenuControleur();
+                    Menu(agence);
+                    break;
+
+            }
+
+        }
+        static void MenuC(Agence agence)
+        {
+         
+            string annonce = "Avez-vous un compte ? 1. Oui 2. Non";
+            int choix = 0;
+            do
+            {
+                choix = agence.SecuriteSaisieNombreINT(annonce);
+
+            } while (!agence.verification(choix, 1, 2));
+            switch (choix)
+            {
+                case 1:
+                    Client a = null;
+                    a = agence.IdclientMenu();
+                    MenuClient(a, agence);
+
+                    break;
+                case 2:
+                    a = null;
+                    agence.AjoutClient(ref a);
+                    MenuClient(a, agence);
+                    break;
+
+            }
+
+
+        }
         static void MenuClient(Client a, Agence agence)
         {
             Console.Clear();
             Console.WriteLine(a.ToString());
-            Console.WriteLine("login: " + a.Login + " \nmot de passe: " + a.Mdps);
+            //Console.WriteLine("login: " + a.Login + " \nmot de passe: " + a.Mdps);
             Console.WriteLine();
             Console.WriteLine("Bienvenue que voulez vous faire?");
-            string  annonce ="1.Modification du compte Client\n 2.Modification du Contrat\n3.revenir au Menu";
+            string  annonce ="1.Modification du compte Client\n 2. Créer un contrat \n3.revenir au Menu";
             int choix = agence.SecuriteSaisieNombreINT(annonce);
             while (!agence.verification(choix, 1, 3))
             {
                 Console.Clear();
                 Console.WriteLine(a.ToString());
-                Console.WriteLine("login: " + a.Login + " \nmot de passe: " + a.Mdps);
+               //Console.WriteLine("login: " + a.Login + " \nmot de passe: " + a.Mdps);
                 Console.WriteLine();
                 Console.WriteLine("redonnez moi un choix");
-                Console.WriteLine("1.Modification du compte Client\n2.Modification du Contrat\n3.revenir au Menu");
+                Console.WriteLine("1.Modification du compte Client \n2.Modification du Contrat \n3.revenir au Menu");
                 choix = agence.SecuriteSaisieNombreINT(annonce);
             }
             switch (choix)
@@ -219,12 +309,13 @@ namespace version_1._0
                     MenuClient(a, agence);
                     break;
                 case 2:
-                    agence.ModificationContrat(a);
+                    //agence.ModificationContrat(a);
+                    agence.CreationContratMenu(a);
                     MenuClient(a,agence);
                     break;
                 case 3:
                     Console.Clear();
-                    Menu(agence);
+                    MenuEmployer(agence);
                     break;
                 default:
                     break;
