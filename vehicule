@@ -54,6 +54,20 @@ namespace version_1._0
                 return immatriculation;
             }
         }
+        public string Marque
+        {
+            get
+            {
+                return marque;
+            }
+        }
+        public string Modele
+        {
+            get
+            {
+                return modele;
+            }
+        }
         public double Tarif
         {
             get
@@ -108,13 +122,22 @@ namespace version_1._0
             {
                 return etatvehicule;
             }
+            set
+            {
+                etatvehicule=value;
+            }
         }
 
         public string[] Localisation
         {
             get
             {
+            
                 return localisation;
+            }
+            set
+            {
+                localisation = value;
             }
         }
 
@@ -147,6 +170,9 @@ namespace version_1._0
                 transmission=value;
             }
         }
+        
+        
+        
 
         //methode        
 
