@@ -28,7 +28,6 @@ namespace version_1._0
             this.nom = nom;
             this.prenom = prenom;
             this.adresse = adresse;            
-            
             this.email = email;
             this.typePermis=typePermis;
             reserve = false;
@@ -105,12 +104,12 @@ namespace version_1._0
         {
             get
             {
-                return TypePermis;
+                return typePermis;
 
             }
             set
             {
-                TypePermis=value;
+                typePermis=value;
             }
 
         }
@@ -139,6 +138,12 @@ namespace version_1._0
         {
             return "nom: " + nom + "\nprénom: " + prenom + "\n Adresse: " + adresse + "\n Email: " + email + "\n Date de naissance" + dateNaissance+
                  "\n Durée du permis"+agepermis+"\n type permis"+typePermis+"\n Réservé"+reserve;
+        }
+
+        public string AffichageClient()
+        {
+            string str = "";
+            return str = "Nom : " + nom + "\n Prénom" + prenom + "\n Adresse: " + adresse;
         }
     }
 }
