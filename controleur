@@ -1,0 +1,48 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace version_1._0
+{
+    class controleur
+    {
+        private List<vehicule> listVehicule;
+        string identifiant;
+        string mdp;
+        public controleur(string identifiant, string mdp)
+        {
+            this.identifiant=identifiant;
+            this.mdp=mdp;
+            listVehicule= new List<vehicule>();
+        }
+        public List<vehicule> ListVehicule
+        {
+            get
+            {
+                return listVehicule;
+            }
+            set
+            {
+                listVehicule=value;
+            }
+        }
+        public string Identifiant
+        {
+            get
+            {
+             return identifiant;   
+            }
+            
+
+        }
+        public string Mdp
+        {
+            get
+            {
+                return mdp;
+            }
+        }
+    }
+}
