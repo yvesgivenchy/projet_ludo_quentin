@@ -8,30 +8,65 @@ namespace version_1._0
 {
     class commande
     {
-        //attribut        
+        //attribut  
+        static int id = 0;
+        private int numCommande;
         private double nbKilometrage;
         private vehicule vehicule;
         private Client client;        
         private bool autoroute;
         private string villeDepart;
-        private string villeRetour;
+        private string villeArrive;
         private string datedebut;
         private string datefin;        
         private bool alleRetour;
 
         
         //constructeur
-        public commande(double nbKilometrage, vehicule vehicule, Client client, string datedebut, string datefin)
+        public commande(double nbKilometrage, vehicule vehicule, Client client,bool autoroute,string villeDepart,string villeArrive,string datedebut, string datefin,bool alleRetour)
         {
-            this.nbKilometrage = nbKilometrage;
+            if (alleRetour == false)
+            {
+                this.nbKilometrage = nbKilometrage;
+            }
+            if (alleRetour == true)
+            {
+                this.nbKilometrage = nbKilometrage * 2;
+            }
             this.vehicule = vehicule;
+            this.client = client;
+            this.autoroute = autoroute;
+            this.villeDepart = villeDepart;
+            this.villeArrive = villeArrive;
             this.datedebut = datedebut;
             this.datefin = datefin;
-            this.client = client;
+            this.alleRetour = alleRetour;          
+            numCommande = id;
+            id++;
            
         }
 
         //propriete
+        public int NumCommande
+        {
+            get
+            {
+                return numCommande;
+            }
+
+        }
+        public double Nbkilometre
+        {
+            get
+            {
+                return nbKilometrage;
+            }
+            set
+            {
+                nbKilometrage = value;
+            }
+        }
+
         public Client Client
         {
             get
@@ -66,20 +101,72 @@ namespace version_1._0
             {
                 autoroute = value;
             }
-        }
-
-        public double Nbkilometre
+        } 
+        
+        public string VilleDepart
         {
             get
             {
-                return nbKilometrage;
+                return villeDepart;
             }
             set
             {
-                nbKilometrage = value;
+                villeDepart = value;
+            }
+        }
+        public string VilleArrive
+        {
+            get
+            {
+                return villeArrive;
+            }
+            set
+            {
+                villeArrive = value;
             }
         }
 
+        public string DateDebut
+        {
+            get
+            {
+                return datedebut;
+            }
+            set
+            {
+                datedebut = value;
+            }
+        }
+
+        public string DateFin
+        {
+            get
+            {
+                return datefin;
+            }
+            set
+            {
+                datefin = value;
+            }
+        }
+
+        public bool AlleRetour
+        {
+            get
+            {
+                return alleRetour;
+            }
+            set
+            {
+                alleRetour = value;
+            }
+        }
+
+        public override string ToString()
+        {
+            return "Client : \n" + client.AffichageClient() + "Voiture : \n" + vehicule.AffichageVehiculeclient() + "\n Trajet:" + "\n" + villeDepart + "==>" + villeArrive
+                + "\n Date :" + "\n" + datedebut + "==>" + datefin + "\n Alle/Retour :" + alleRetour;
+        }
 
     }
 }
