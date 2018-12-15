@@ -6,24 +6,54 @@ using System.Threading.Tasks;
 
 namespace version_1._0
 {
-    class Agence
+    class Agence: Imaintenance
     {
         private List<vehicule> listVehicule;        
         private List<Client> listClient;
+        private List<devis> listDevis;
+        private List<commande> listCommande;
         private List<Contrat> listContrat;
         private Maintenance Maintenance;
+        private List<vehicule> listMaintenance;
+        private List<controleur>  listControleur;
+         
         private string login;
         private string mdp;
         public Agence (Maintenance a, string login, string mdp)
         {
             listVehicule = new List<vehicule>();
             listClient = new List<Client>();
+            listCommande = new List<commande>();            
+            listDevis = new List<devis>();
             listContrat = new List<Contrat>();
+            listMaintenance = new List<vehicule>(listVehicule.Count);
+            listControleur= new List<controleur>(3);
             Maintenance = a;
             this.login=login;
             this.mdp = mdp;
 
             
+        }
+        public List<Contrat> ListContrat
+        {
+            get
+            {
+                return listContrat;
+            }
+        }
+        public List<commande> ListCommande
+        {
+            get
+            {
+                return listCommande;
+            }
+        }
+        public List<devis> ListDevis
+        {
+            get
+            {
+                return listDevis;
+            }
         }
         public List<Client> ListClient
         {
@@ -56,59 +86,182 @@ namespace version_1._0
 
         }
 
-        public List<Contrat> ListContrat
+        
+        public void CreationContratMenu(Client c)
         {
-            get
+            if (c.Reserve == false)
             {
-                return listContrat;
+                CreationContrat(c);
+            }
+            else
+            {
+                Console.Clear();
+                Console.WriteLine("Vous avez déjà un contrat");
+                foreach (Contrat co in listContrat)
+                {
+                    if (co.Devis.Commande.Client.Identifiant == c.Identifiant)
+                    {
+                        Console.WriteLine(co.ToString());
+                    }
+
+                }
+                Console.WriteLine("Appuyez sur espace");
+                Console.ReadKey();
+
+            }
+            
+
+        }
+        
+        public Client IdclientMenu()
+        {
+            Client a = null;
+            string nom;
+            string prenom;
+            string adresse;
+            bool sortie = false;
+            int cpt = 0;
+            do
+            {
+                Console.WriteLine("Donnez moi votre nom");
+                nom = Console.ReadLine();
+                Console.WriteLine("Donnez moi vitre prénom");
+                prenom = Console.ReadLine();
+                Console.WriteLine("Donnez moi l'adresse");
+                adresse = Console.ReadLine();
+
+                if (!VerifClient(nom, prenom, adresse))
+                {
+                    Console.Clear();
+                    Console.WriteLine("ils semblent que votre nom et prénom n'existe pas. Voulez vous recommencez ou voulez vous crée un compte");
+                    string annonce ="1.Recommencez 2.Crée un compte";
+                    int option = 0;
+                    do
+                    {
+                        option =SecuriteSaisieNombreINT(annonce);
+                    } while (!verification(option, 1, 2));
+                    if (option == 2)
+                    {
+                        sortie = true;
+
+                    }
+
+                }
+                cpt++;
+
+            } while (!VerifClient(nom, prenom, adresse) && !sortie && cpt < 3);
+            if (sortie==true||cpt==3)
+            {
+                if (cpt == 3)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Vous n'êtes pas référencé nous allons vous créer un nouveaux compte,\n cliquez sur espace pour continuer");
+                    Console.ReadKey();
+                    AjoutClient(ref a);
+                }
+                AjoutClient(ref a);                
+            }
+            if (!sortie)
+            {
+                foreach (Client C in ListClient)
+                {
+                    if (C.Nom.ToLower() == nom.ToLower() && C.Prenom.ToLower() == prenom.ToLower() && C.Adresse.ToLower() == adresse.ToLower())
+                    {
+                        a = C;
+
+                    }
+                }               
+
+            }
+            return a;
+        }
+        public void CreationContrat(Client c)
+        {
+            string annonce = "";
+            int choix = 0;
+            Console.WriteLine("Commande :");
+            devis d = new devis(CreationCommande(c));
+            Console.WriteLine(d.ToString());
+            int cpt = 0;
+            do
+            {
+                annonce = "Ce devis vous convient-il ? 1. Oui 2. Non";
+                choix = 0;
+                do
+                {
+                    choix = SecuriteSaisieNombreINT(annonce);
+
+                } while (!verification(choix, 1, 2));
+                switch (choix)
+                {
+                    case 1:
+                        d.Validation = true;
+                        break;
+                    case 2:
+                        d.Validation = false;
+                        d.Commande = ModificationCommande(d, c);
+                        break;
+                }
+                cpt++;
+
+            } while (d.Validation == false && cpt < 10);
+            if (cpt < 10)
+            {
+                Console.WriteLine("Création de votre contrat");
+                Contrat con = new Contrat(d);
+                listContrat.Add(con);
+                c.Reserve = true;
+            }
+            if (10 <= cpt)
+            {
+                Console.WriteLine("Nous ne pourrons pas faire mieux pour vous");
             }
 
         }
 
 
-        /* public void Affichage( )
-         {
-             foreach( Voiture c in ListVehicule)
-             {
-                 Console.WriteLine(c.ToString());
-             }
-         }*/
         
 
-        
+        public bool VerifClient(string nom, string prenom,string adresse)
+        {
+            bool etat = false;
+            int cpt = 0;
+            Client c = null;
+            while (cpt<ListClient.Count&&etat == false)
+            {
+                c = ListClient[cpt];
+                if (nom.ToLower() == c.Nom.ToLower() && prenom.ToLower() == c.Prenom.ToLower() && adresse.ToLower() == c.Adresse.ToLower())
+                {
+                    etat = true;
+                }
+                cpt++;
+            }
+            return etat;
+        }
         public void AjoutClient(ref  Client A)
         {
             bool teste = false;
             string nom=null;
-            string prénom=null;
+            string prenom=null;
             string adresse = null;
-            while (!teste)
+            do
             {
                 teste = true;
                 Console.WriteLine("Donnez moi votre nom:");//vérifie nom prénom
-                 nom = Console.ReadLine();
+                nom = Console.ReadLine();
                 Console.WriteLine("Donnez moi votre prénom:");
-                 prénom = Console.ReadLine();
+                prenom = Console.ReadLine();
                 Console.WriteLine("Donnez moi votre adresse");
-                 adresse = Console.ReadLine();
+                adresse = Console.ReadLine();
                 Console.Clear();
-                foreach (Client c in ListClient)
-                {
-                    if (c.Nom == nom && c.Prenom == prénom)
-                    {
-                        if (c.Adresse == adresse)
-                        {
-                            teste = false;
-                        }
-                    }
-                }
-                if (!teste)
+                teste = VerifClient(nom, prenom, adresse);
+                if (teste)
                 {
                     Console.Clear();
-                    Console.WriteLine("Ils semblerait que votre nom  et prénom soit déjà prit et que votre adresse aussi, veuillez refaire la manipulation ");
-                    
-                }                
-            }
+                    Console.WriteLine("Il semblerait que vous soyez déjà client, veuillez refaire la manipulation ");
+
+                }
+            } while (teste);
             Console.Clear();       
                      
             Console.WriteLine("Donnez moi votre date de naissance sous le format j/m/a");
@@ -127,9 +280,9 @@ namespace version_1._0
             string typePermis=Console.ReadLine();
 
 
-            A = new Client(nom, prénom, adresse,email,dateNaissance, obtentionpermis,typePermis);
+            A = new Client(nom, prenom, adresse,email,dateNaissance, obtentionpermis,typePermis);
             ListClient.Add(A);
-            Console.WriteLine(A.Identifiant);
+            
             
         }
         public void ModifcationClient(Client a)
@@ -260,11 +413,10 @@ namespace version_1._0
             return typeVehicule;
         }
 
-        public vehicule ChoixVoiture(List<vehicule> listVoitureCritere, int choix, Contrat c)// prgramme Main pour la modification voiture
+        public vehicule ChoixVoiture(List<vehicule> listVoitureCritere, int choix, Client f)// prgramme Main pour la modification voiture
         {
 
-
-            Client f= c.Client;
+            
             vehicule l=null;
             string typeVehicule=null;// regarde le type de véhicule
             if(choix==1)
@@ -285,7 +437,7 @@ namespace version_1._0
                     if(typeVehicule!="Scooter")
                     {
                         Console.WriteLine("Vous n'avez pas le permis pour conduire la moto");
-                        ModificationContrat(f);
+                        CreationCommande(f);
                     }                        
                 }
                        
@@ -340,7 +492,7 @@ namespace version_1._0
             vehicule v=listVoitureCritere[opt];
             return v;          
         }
-        public void RechercheVoiture(ref List<vehicule> listVoitureCritere, string typeVehicule,string transmission)
+        /*public void RechercheVoiture(ref List<vehicule> listVoitureCritere, string typeVehicule,string transmission)
         {
             int i=0;
             
@@ -353,9 +505,9 @@ namespace version_1._0
                     if (l.TypeVehicule == typeVehicule&& l.Transmission==transmission )
                     {
                         listVoitureCritere.Add(l);
-                       /* Console.WriteLine(i+l.ToString());
+                       Console.WriteLine(i+l.ToString());
                         Console.WriteLine("-------------");
-                        i++;*/
+                        i++;
                     }
                 }
                 else if(typeVehicule != null &&transmission==null||typeVehicule == null &&transmission!=null)
@@ -365,9 +517,9 @@ namespace version_1._0
                         if (l.TypeVehicule == typeVehicule)
                         {
                         listVoitureCritere.Add(l);
-                       /* Console.WriteLine(i+l.ToString());
+                       Console.WriteLine(i+l.ToString());
                         Console.WriteLine("-------------");
-                        i++;*/
+                        i++;
                         }
                     }   
                     else
@@ -375,9 +527,9 @@ namespace version_1._0
                             if ( l.Transmission==transmission )
                             {
                             listVoitureCritere.Add(l);
-                          /*  Console.WriteLine(i+l.ToString());
+                            Console.WriteLine(i+l.ToString());
                             Console.WriteLine("-------------");
-                            i++;*/
+                            i++;
                             }
 
                     }
@@ -385,18 +537,19 @@ namespace version_1._0
                 else
                 {
                     listVoitureCritere.Add(l);
-                    /*
+                    
                     Console.WriteLine(i+l.ToString());
                         Console.WriteLine("-------------");
                         i++; 
-                        */
+                        
 
                 }
 
 
             }
             
-        }
+        }*/
+
         public void RechercheVehicule(ref List<vehicule> listVoitureCritere, string typeVehicule,string transmission,int choix)
         {        
             int i=0;
@@ -407,7 +560,7 @@ namespace version_1._0
                 {
                     if (typeVehicule != null && transmission != null)
                     {
-                        if (l.TypeVehicule == typeVehicule && l.Transmission == transmission)
+                        if (l.TypeVehicule == typeVehicule && l.Transmission == transmission&& !l.Reserve)
                         {
 
                             listVoitureCritere.Add(l);
@@ -416,18 +569,18 @@ namespace version_1._0
                         }
                     }
 
-                    else if (typeVehicule != null && transmission == null || typeVehicule == null && transmission != null)
+                    else if (typeVehicule != null && transmission == null && !l.Reserve || typeVehicule == null && transmission != null && !l.Reserve)
                     {
-                        if (typeVehicule != null)
+                        if (typeVehicule != null && !l.Reserve)
                         {
-                            if (l.TypeVehicule == typeVehicule)
+                            if (l.TypeVehicule == typeVehicule && !l.Reserve)
                             {
                                 listVoitureCritere.Add(l);
                             }
                         }
                         else
                         {
-                            if (l.Transmission == transmission)
+                            if (l.Transmission == transmission && !l.Reserve)
                             {
                                 listVoitureCritere.Add(l);
                             }
@@ -448,7 +601,7 @@ namespace version_1._0
 
             }
         }
-        public void RechercheMoto(ref List<vehicule> listVoitureCritere, string typeVehicule,string transmission)
+        /*public void RechercheMoto(ref List<vehicule> listVoitureCritere, string typeVehicule,string transmission)
         {
             int i=0;
             foreach (moto l in listVehicule)
@@ -498,6 +651,7 @@ namespace version_1._0
 
             }
         }
+        
         public void RechercheCamion(ref List<vehicule> listVoitureCritere, string typeVehicule,string transmission)
         {
         int i=0;
@@ -548,141 +702,22 @@ namespace version_1._0
 
             }
             
-        }
-        public void ModificationContrat(Client c)
+        }*/
+        
+        public commande CreationCommande(Client c)
         {
             Console.Clear();
-            List<vehicule> listVoitureCritére = new List<vehicule>(listVehicule.Count);
+            List<vehicule> listVoitureCritere = new List<vehicule>(listVehicule.Count);
             bool teste = c.Reserve;
-            Contrat contrat=null; 
+            commande commande=null; 
             vehicule v= null;
-            vehicule v2;
-            if (teste)
-            {
-                foreach(Contrat C in ListContrat)
-                {
-                    if (C.Client.Identifiant == c.Identifiant)
-                    {
-                        contrat = C;
-                    }
-                }
-                Console.WriteLine("Vous avez un vehicule");
-                 v = contrat.Vehicule;
-                Console.WriteLine(v.ToString());
-                Console.WriteLine("Que voulez vous faire?");
-                Console.WriteLine("1.Modifiez la voiture\n 2.Modifiez le nb de kilométrage\n");// choix de modification
-                int choix;
-                do
-                {
-                    choix = int.Parse(Console.ReadLine());
-                } while (!verification(choix, 1, 2));
-                switch (choix)
-                {
-                    case 1:
-                        Console.Clear();
-                        Console.WriteLine("Que voulez vous comme type de voiture");
-                        Console.WriteLine("1.Voiture\n 2.Moto\n3.Camion"); // choix du type de voiture 
-                        
-                        int option = int.Parse(Console.ReadLine());
-                        while (!verification(option, 1, 3))
-                        {
-                            option = int.Parse(Console.ReadLine());
-                        }
-                        switch (option)
-                        {
-                            case 1:
-                                if (v is voiture)// si il avait déjà une voiture
-                                { 
-                                    ChangmentReserve(v);
-                                    v=ChoixVoiture(listVoitureCritére, choix, contrat);
-                                    contrat.Vehicule=v;        
-                                }
-                                else
-                                {
-                                    if(c.TypePermis=="B"||c.TypePermis=="BE")
-                                    {
-                                        ChangmentReserve(v);
-                                       v= ChoixVoiture(listVoitureCritére,choix,contrat);
-                                       contrat.Vehicule=v;                                      
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine("Vous n'avez pas le type de permis requis, Nous vous renvoyons au menu client");                                       
-                                    }                                                                       
-                                }
-                                break;
-                                case 2:
-                                        if (v is moto)// si il avait déjà une voiture
-                                        { 
-                                           ChangmentReserve(v);
-                                            v=ChoixVoiture(listVoitureCritére, choix, contrat);
-                                            contrat.Vehicule=v;                                                                       
-                                        }                     
-                                        else if(c.TypePermis=="A1"||c.TypePermis=="A2")
-                                        {
-                                            ChangmentReserve(v);
-                                            v=ChoixVoiture(listVoitureCritére,choix,contrat);
-                                            contrat.Vehicule=v;                                      
-                                        }
-                                        else
-                                        {
-                                            Console.WriteLine("Vous n'avez pas le type de permis requis, Nous vous renvoyons au menu client");                                       
-                                        }
-                                                                  
-                                break;
-                                case 3 :
-                                if(v is camion)
-                                    {
-                                        ChangmentReserve(v);
-                                        v= ChoixVoiture(listVoitureCritére,choix,contrat);
-                                        contrat.Vehicule=v;                                       
-                                    }
-                                    else
-                                    {
-                                        if(c.TypePermis=="C"||c.TypePermis=="C1"|| c.TypePermis=="C1E")
-                                        {
-                                           ChangmentReserve(v);
-                                            v=ChoixVoiture(listVoitureCritére,choix,contrat);
-                                            contrat.Vehicule=v;
-                                        }
-                                        else
-                                        {
-                                            Console.WriteLine("Vous n'avez pas le type de permis requis, Nous vous renvoyons au menu client");                                       
-                                        }
-                                    }                 
-                                break;
-
-                               
-
-                        }
-                    
-                    break;
-                    case 2:// cas ou il veut modifier son kilométrage
-                    Console.WriteLine("Donnez moi le nouveau kilométrage");
-                    double nbKilom=Double.Parse(Console.ReadLine());
-                    contrat.NbKilometrage=nbKilom;
-                    break;
-                }
-                int i=0;
-                int identif=0;
-                foreach(Contrat f in listContrat)
-                {
-                    if(contrat.Identifiant==f.Identifiant)identif=i;
-                    else i++;
-
-                }
-                listContrat[identif]=contrat;
-                
-                
-            }
-            else                // si il n'a pas de voiture
-            {
-            Console.WriteLine("Vous n'avez pas de contrat");
-            Console.WriteLine("Donnez moi le type de vehicule que vous voulez prendre:\n1.Voiture\n2.Moto\n3.Camion");
-            int option ;
+            vehicule v2=null;            
+            Console.WriteLine("Nouvelle commande");
+            string annonce="Donnez moi le type de vehicule que vous voulez prendre:\n1.Voiture\n2.Moto\n3.Camion";
+            int option = 0;
             do
             {
-                option= int.Parse(Console.ReadLine());
+                option= SecuriteSaisieNombreINT(annonce);
 
             }while(!verification(option,1,3));
             Console.WriteLine();
@@ -692,7 +727,7 @@ namespace version_1._0
                 {
                     if(c.TypePermis=="B"||c.TypePermis=="BE")
                     {
-                        v= ChoixVoiture(listVoitureCritére,option,contrat);                        
+                        v= ChoixVoiture(listVoitureCritere,option, c);                        
                     }
                     else
                     {
@@ -704,7 +739,7 @@ namespace version_1._0
                 {
                     if(c.TypePermis=="A1"||c.TypePermis=="A2")
                     {
-                        v=ChoixVoiture(listVoitureCritére,option,contrat);                    
+                        v=ChoixVoiture(listVoitureCritere,option,c);                    
                     }
                     else
                     {
@@ -714,9 +749,9 @@ namespace version_1._0
                 break;
                 case 3:
                 {
-                 if(c.TypePermis=="C"||c.TypePermis=="C1"|| c.TypePermis=="C1E")
+                    if(c.TypePermis=="C"||c.TypePermis=="C1"|| c.TypePermis=="C1E")
                     {
-                        v=ChoixVoiture(listVoitureCritére,option,contrat);                   
+                        v=ChoixVoiture(listVoitureCritere,option,c);                   
                     }
                     else
                     {
@@ -729,85 +764,296 @@ namespace version_1._0
                 } break;
 
             }
-            Console.WriteLine("Donnez moi le nombre kilométre à parcourir");
-            double nbKilom= Double.Parse(Console.ReadLine());
-            double Coutotal=0;
-            Console.WriteLine("Donnez moi la date du début du contrat en jour, mois année");// sécurisation date à faire
+            Console.WriteLine("Donnez-moi votre lieu de départ");
+            string villeDepart = Console.ReadLine();    
+            Console.WriteLine("Donnez-moi votre lieu d'arriver");
+            string villeArriver = Console.ReadLine();
+            annonce="Donnez moi le nombre kilométre à parcourir";            
+            double nbKilom = SecuriteSaisieNombreINT(annonce);
+            annonce="Allez vous prendre l'autoroute? 1. Oui 2.Non";
+            bool autoroute = false;
+            int choix = 0;
+            do
+            {
+                Console.Clear();
+                choix = SecuriteSaisieNombreINT(annonce);
+            } while (!verification(choix, 1, 2));
+            switch (choix)
+            {
+                case 1:
+                    autoroute = true;
+                    break;
+                case 2:
+                    autoroute = false;
+                    break;
+            }
+            annonce = "Allez-vous faire un aller/retour ? 1. Oui 2. Non";
+            bool alleRetour = false;
+            choix = 0;
+            do
+            {
+                Console.Clear();
+                choix = SecuriteSaisieNombreINT(annonce);
+            } while (!verification(choix, 1, 2));
+            switch (choix)
+            {
+                case 1:
+                    alleRetour = true;
+                    break;
+                case 2:
+                    alleRetour = false;
+                    break;
+            }
+
+
             string dateDebut;
             do
             {
-             dateDebut= date();
-            }while(dateVerif(dateDebut));
+                Console.Clear();
+                Console.WriteLine("Donnez moi la date du début du contrat en jour, mois année");// sécurisation date à faire
+                dateDebut = date();
+            } while(!dateVerif(dateDebut));
             Console.WriteLine("Donnez moi la date de la fin du contrat");
             string dateFin= date();
             v.Reserve=true;
-            Contrat c2 = new Contrat(nbKilom,v,c,dateDebut,dateFin);
-            listContrat.Add(c2);
+            commande c2 = new commande(nbKilom,v,c,autoroute,villeDepart,villeArriver,dateDebut,dateFin,alleRetour);
+            listCommande.Add(c2);
+            return c2;
+
 
             
 
+            
+        }
+
+        public commande ModificationCommande(devis d,Client c) 
+        {
+            Console.Clear();
+            List<vehicule> listVoitureCritére = new List<vehicule>(listVehicule.Count);            
+            commande commande = null;
+            vehicule v = null;
+            vehicule v2;
+            if (d.Commande.Client==c)
+            {
+                
+                Console.WriteLine("Le devis ne vous convient pas ?");
+                v = commande.Vehicule;                
+                Console.WriteLine("Que voulez vous faire?");
+                Console.WriteLine("1.Modifiez la voiture\n 2.Modifiez le nb de kilométrage\n 3.Modifiez Allé/Retour\n 4. Modifiez autoroute");// choix de modification
+                int choix;
+                do
+                {
+                    choix = int.Parse(Console.ReadLine());
+                } while (!verification(choix, 1, 2));
+                switch (choix)
+                {
+                    case 1:
+                        Console.Clear();
+                        Console.WriteLine("Que voulez vous comme type de voiture");
+                        Console.WriteLine("1.Voiture\n 2.Moto\n3.Camion"); // choix du type de voiture 
+
+                        int option = int.Parse(Console.ReadLine());
+                        while (!verification(option, 1, 3))
+                        {
+                            option = int.Parse(Console.ReadLine());
+                        }
+                        switch (option)
+                        {
+                            case 1:
+                                if (v is voiture)// si il avait déjà une voiture
+                                {
+                                    ChangmentReserve(v);
+                                    v = ChoixVoiture(listVoitureCritére, choix, c);
+                                    d.Commande.Vehicule = v;
+                                }
+                                else
+                                {
+                                    if (c.TypePermis == "B" || c.TypePermis == "BE")
+                                    {
+                                        ChangmentReserve(v);
+                                        v = ChoixVoiture(listVoitureCritére, choix, c);
+                                        d.Commande.Vehicule = v;
+
+
+
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Vous n'avez pas le type de permis requis, Nous vous renvoyons au menu client");
+                                    }
+                                }
+                                break;
+                            case 2:
+                                if (v is moto)// si il avait déjà une voiture
+                                {
+                                    ChangmentReserve(v);
+                                    v = ChoixVoiture(listVoitureCritére, choix, c);
+                                    d.Commande.Vehicule = v;
+                                }
+                                else if (c.TypePermis == "A1" || c.TypePermis == "A2")
+                                {
+                                    ChangmentReserve(v);
+                                    v = ChoixVoiture(listVoitureCritére, choix, c);
+                                    d.Commande.Vehicule = v;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Vous n'avez pas le type de permis requis, Nous vous renvoyons au menu client");
+                                }
+
+                                break;
+                            case 3:
+                                if (v is camion)
+                                {
+                                    ChangmentReserve(v);
+                                    v = ChoixVoiture(listVoitureCritére, choix, c);
+                                    d.Commande.Vehicule = v;
+                                }
+                                else
+                                {
+                                    if (c.TypePermis == "C" || c.TypePermis == "C1" || c.TypePermis == "C1E")
+                                    {
+                                        ChangmentReserve(v);
+                                        v = ChoixVoiture(listVoitureCritére, choix, c);
+                                        d.Commande.Vehicule = v;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Vous n'avez pas le type de permis requis, Nous vous renvoyons au menu client");
+                                    }
+                                }
+
+                                break;
+
+
+
+                        }
+
+                        break;
+
+                    case 2:// cas ou il veut modifier son kilométrage
+                        string annonce = "Donnez moi le nouveau kilométrage";
+                        double nbKilom = SecuriteSaisieNombreDOUBLE(annonce);
+                        d.Commande.Nbkilometre = nbKilom;
+                        break;
+
+                    case 3:
+                        annonce = "Souhaitez-vous faire : 1.Allé/Retour 2.Allé simple";
+                        while (!verification(choix, 1, 2))
+                        {
+                            Console.Clear();
+                            choix = SecuriteSaisieNombreINT(annonce);
+
+                        }
+                        switch (choix)
+                        {
+                            case 1:
+                                d.Commande.AlleRetour = true;
+                                break;
+                            case 2:
+                                d.Commande.AlleRetour = false;
+                                break;
+                        }
+                        break;
+                    case 4:
+                        annonce = "Souhaitez-vous faire : 1. Autoroute 2. Sans autoroute";
+                        while (!verification(choix, 1, 2))
+                        {
+                            Console.Clear();
+                            choix = SecuriteSaisieNombreINT(annonce);
+
+                        }
+                        switch (choix)
+                        {
+                            case 1:
+                                d.Commande.Autoroute = true;
+                                break;
+                            case 2:
+                                d.Commande.Autoroute = false;
+                                break;
+                        }
+                        break;
+
+
+                }
+                int i = 0;                
+                foreach (devis f in listDevis)
+                {
+                    if (commande.NumCommande == f.Commande.NumCommande)
+                    {
+                        listCommande[i] = commande;
+                    }
+                    i++;                   
+
+                }
+                
+                
+
+
             }
+            return commande;
         }
         public string date()
         {
-            Console.WriteLine("Donnez moi d'abord le mois"):
-            string mois;
+            string annonce ="Donnez moi d'abord le mois";
+            int moi = 0;          
             
-            int moi;
             do
-            {
-                mois=Console.ReadLine();
-                moi =Convert.ToInt32(mois);
+            {                
+                moi = SecuriteSaisieNombreINT(annonce);
 
-            }while(!verification(moi,1,12));
+            } while(!verification(moi,1,12));
             
-            Console.WriteLine("Donnez moi le jour");            
-            string jour;
-            if(mois=="2")
+            annonce="Donnez moi le jour";            
+            int jour=0;
+            if(moi==2)
             {
                 do
                 {
-                    jour=Console.ReadLine();
-                }while(verification(Convert.ToInt32(jour),1,28));
+                    jour = SecuriteSaisieNombreINT(annonce);
+
+                }while(!verification(jour,1,28));
 
             }
             else if(moi!=2 &&moi<=7&&moi%2==0)
             {
                 do
                 {
-                    jour=Console.ReadLine();
+                    jour= SecuriteSaisieNombreINT(annonce);
 
-                }while(verification(Convert.ToInt32(jour),1,30));
+                } while(!verification(jour,1,30));
             }
             else if(moi!=2 &&moi<=7&&moi%2!=0)
             {
                 do
                 {
-                    jour=Console.ReadLine();
+                    jour= SecuriteSaisieNombreINT(annonce);
 
-                }while(verification(Convert.ToInt32(jour),1,31));
+                } while(!verification(jour,1,31));
 
             }
             else if(moi>=8&&moi%2==0)
             {
                 do
                 {
-                    jour=Console.ReadLine();
+                    jour= SecuriteSaisieNombreINT(annonce);
 
-                }while(verification(Convert.ToInt32(jour),1,31));
+                } while(!verification(jour,1,31));
             }
             else
             {
                 do
                 {
-                    jour=Console.ReadLine();
+                    jour= SecuriteSaisieNombreINT(annonce);
 
-                }while(verification(Convert.ToInt32(jour),1,30));
+                } while(!verification(jour,1,30));
 
             }
-            Console.WriteLine("Donnez moi l'année");            
-            string année= Console.ReadLine();
-            return jour+"/"+mois+"/"+année;
+            annonce="Donnez moi l'année";            
+            int annee= SecuriteSaisieNombreINT(annonce);
+            string[] tab = new string[3];
+            string str = jour + "/" + moi + "/" + annee;
+            return str;
 
         }
         
@@ -842,14 +1088,327 @@ namespace version_1._0
             {
                 teste=false;
                 
-            }else if(Convert.ToInt32(aujourdhui[0])>Convert.ToInt32(dateDEbut[]))
+            }else if(Convert.ToInt32(aujourdhui[0])>Convert.ToInt32(dateDEbut[0])&&aujourdhui[1]==dateDEbut[1])
             {
                 teste=false;
 
             }
             return teste;
         }
+                                                        // Méthode Maintenance                                                       
+        
+        
+        public void Remplissage(ref bool[,] mat)// on utilise cette méthode au début du programme.cs afin de savoir quelle place sont déjà prise
+        {
+            bool voiture;
+            for(int i = 0; i < mat.GetLength(0); i++)
+            {
+                
+                for (int j = 0; j < mat.GetLength(1); j++)
+                {
+                    voiture = false;
+                    foreach ( vehicule c in listVehicule)
+                    {
+                        string[] localisation= c.Localisation;
+                        if (i == Convert.ToInt32(localisation[0]) && j == Convert.ToInt32(localisation[1]))
+                        {
+                            mat[i, j] = true;
+                            voiture = true;
+                        }
+                        else
+                        {
+                            if (!voiture)
+                            {
+                                mat[i, j] = false;
+                            }
+                        }
 
+                    }
+
+                }
+            }
+        }
+        
+        public void AffichageContratPerime(ref List<Contrat> ListContratPermie)
+        {
+
+            foreach(Contrat c in listContrat)
+            {
+                if(!VerificationDate(c.Devis.Commande.DateDebut))
+                {
+                    ListContratPermie.Add(c);
+                }
+
+            }
+
+        }
+        public void ModificationClientVoiture(vehicule v, Client c)
+        {
+            foreach(vehicule w in ListVehicule)
+            {
+                if(v.Immatriculation==w.Immatriculation)
+                {
+                    w.Reserve=false;
+                }
+
+            }
+            
+            foreach(Client o in ListClient)
+            {
+                if(o.Identifiant==c.Identifiant)
+                {
+                  o.Reserve=false ; 
+                }
+            }
+
+
+        }
+        public void AjoutVoitureToMaintenance(vehicule v)
+        {
+            listMaintenance.Add(v);
+        }        
+        public void SupressionContrat(Contrat c)
+        {
+            int numerodevis = 0;
+            int numerocommande = 0;
+            foreach(Contrat cc in listContrat)
+            {
+                if (cc.NumContrat == c.NumContrat)
+                {
+                    numerodevis = cc.Devis.NumDevis;
+                    listContrat.Remove(cc);
+                }              
+                
+            }
+            foreach (devis dd in listDevis)
+            {
+                if (dd.NumDevis == numerodevis)
+                {
+                    numerocommande = dd.Commande.NumCommande;
+                    listDevis.Remove(dd);
+                }
+
+            }
+            foreach (commande cco in listCommande)
+            {
+                if (cco.NumCommande == numerocommande)
+                {
+                    
+                    listCommande.Remove(cco);
+                }
+
+            }
+
+        }
+        public void EnvoiePositionClient()
+        {
+            Console.WriteLine("Donnez moi le Client parmis la liste");
+            int i = 0;
+            foreach (Client w in ListClient)
+            {
+                Console.Write(i + w.AffichageClient());
+                i++;
+            }
+            Console.WriteLine("Donnez moi votre choix");
+            int choix;
+            do
+            {
+                choix = int.Parse(Console.ReadLine());
+            } while (verification(choix,0,i));
+            Client c = listClient[choix];
+            string[] position = new string[2];
+            foreach (commande C in listCommande)// doute si on peut utiliser les objets commandes vu qu'elles ne sont peut être pas vrais
+            {
+                if (C.Client.Identifiant == C.Client.Identifiant)
+                {
+                    position = C.Vehicule.Localisation;
+                }
+            }
+            Console.WriteLine("Bonjour Madame/Monsieur" + c.Nom + c.Prenom);
+            Console.WriteLine("Vous avez accées à votre voiture située au parking" + position[0] + "à la place" + position[1]);
+
+
+        }
+        public bool VerificationDate(string dateDebut)
+        {
+            string[] dateDEbut = dateDebut.Split('/');
+            bool teste = true;
+            DateTime date = DateTime.Today;
+            string nom = Convert.ToString(date);
+            string[] tab = nom.Split(' ');
+            string[] aujourdhui = tab[0].Split('/');
+            if (Convert.ToInt32(aujourdhui[2]) > Convert.ToInt32(dateDEbut[2]))
+            {
+                teste = false;
+
+            }
+            else if (Convert.ToInt32(aujourdhui[1]) > Convert.ToInt32(dateDEbut[1]))
+            {
+                teste = false;
+
+            }
+            else if (Convert.ToInt32(aujourdhui[0]) >= Convert.ToInt32(dateDEbut[0]) && aujourdhui[1] == dateDEbut[1])
+            {
+                teste = false;
+
+            }
+            return teste;
+
+        }
+        public bool VerificationPlace(bool[,] mat, string[] position)
+        {
+            bool teste = true;
+            if(mat[Convert.ToInt32(position[0]), Convert.ToInt32(position[1])]== true)
+            {
+                Console.WriteLine("il semblerait que la place ne soit pas bonne");
+                teste = false;
+            }
+            return teste;
+        }
+
+        public void StationementVehicule(bool[,] mat, vehicule V, string[] position)// La variable poition sera nul si on vient de crée un véhicule mais sera rempli quand le client rendra le véhicule
+        {
+            if (position == null)
+            {
+                for (int i = 0; i < mat.GetLength(0); i++)
+                {
+                    for (int j = 0; j < mat.GetLength(1); j++)
+                    {
+                        if (!mat[i, j])
+                        {
+                            position[0] = Convert.ToString(i);
+                            position[1] = Convert.ToString(j);
+                            Console.WriteLine("La voiture à été garée dans le parking numéro" + position[0] + "à la place numéro A" + position[1]);
+                            mat[i, j] = true;
+                            V.Localisation = position;
+                            // appellée le menu
+                        }
+
+                    }
+                }
+
+            }
+            else
+            {
+                int i = Int32.Parse(position[0]);
+                int j = Int32.Parse(position[1]);
+                if (!mat[i, j])
+                {
+                    mat[i, j] = true;
+                    V.Localisation = position;
+                    Console.WriteLine("La voiture à été garée dans le parking numéro" + position[0] + "à la place numéro A" + position[1]);
+                    // appellée le menuMaintenance
+                }
+                else
+                {
+                    Console.WriteLine("Ils sembleraient que la positin donnée par le client ne soit pas bonne voulez vous recommencez ou voulez vous que je vous donne les places disponibles?");
+                    Console.WriteLine("0.Recommencez     1.Indiquez les positions");
+                    int option = int.Parse(Console.ReadLine());
+                    Console.Clear();
+                    if (option == 0)
+                    {
+                        do
+                        {
+                            Console.WriteLine("Donnez moi le numéro de parking");
+                            int parking = int.Parse(Console.ReadLine());
+                            Console.WriteLine("Donnez moi le numéro de la place");
+                            int place = int.Parse(Console.ReadLine());
+                            if (!VerificationPlace(mat, parking, place))
+                            {
+                                mat[parking, place] = true;
+                                position[0] = Convert.ToString(parking);
+                                position[1] = Convert.ToString(place);
+                                V.Localisation = position;
+                                Console.WriteLine("La voiture à été garée dans le parking numéro" + position[0] + "à la place numéro A" + position[1]);
+
+                                // appellée le menuMaintenance
+                            }
+                            else
+                            {
+                                Console.WriteLine("La place que vous m'avez donnée n'est toujours pas bonne voulez vous recommencez? ou voulez avoir les places disponibles");
+                                option = int.Parse(Console.ReadLine());
+                                Console.Clear();
+                                if (option == 1) IndiquezPlace(mat, V, position);
+                            }
+                        } while (option == 0);
+
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        IndiquezPlace(mat, V, position);
+                    }
+
+                }
+
+            }
+
+
+        }
+        public void AlerteClient(Client c, vehicule v)
+        {
+            string nom= c.Nom;
+            string prenom=c.Prenom;
+            string immatriculation= v.Immatriculation;
+            string modele= v.Modele;
+
+            Console.WriteLine("Bonjour Monsieur/Madame "+prenom+nom);
+            Console.WriteLine("Nous souhiatons vous informez que le véhicule suivant:\n modéle"+modele+"\n"+immatriculation);
+
+        }
+        public void IndiquezPlace(bool[,] mat, vehicule V, string[] position)
+        {
+            Console.Clear();
+            int[] tab = new int[21];
+            int w = 0;
+            int i;
+            for (i = 0; i < mat.GetLength(0); i++)
+            {
+                for (int j = 0; j < mat.GetLength(1); j++)
+                {
+                    if (!mat[i, j]) w++;
+
+                }
+                tab[i] = w;
+                w = 0;
+            }
+            for (i = 0; i < tab.Length; i++)
+            {
+                Console.WriteLine("Dans le parking numéro" + i + 1 + "il reste" + tab[i] + "place(s)");
+            }
+            Console.WriteLine("Donnez moi le parking que vous voulez ");
+            int parking = int.Parse(Console.ReadLine());
+            bool teste = false;
+            for (int k = 0; k < mat.GetLength(1); k++)
+            {
+                if (!mat[parking, k])
+                {
+                    mat[parking, k] = true;
+                    position[0] = Convert.ToString(parking);
+                    position[1] = Convert.ToString(k);
+                    V.Localisation = position;
+                    teste = true;
+                    Console.WriteLine("La voiture à été garée dans le parking numéro" + position[0] + "à la place numéro A" + position[1]);
+                    //RetourMenuMaintenance
+                }
+            }
+            if (!teste)
+            {
+                Console.WriteLine("LA place donnée n'est toujours pas bonne nous devons recommencez");
+                IndiquezPlace(mat, V, position);
+            }
+
+        }
+
+
+
+        public bool VerificationPlace(bool[,] mat, int i, int j)
+        {
+            bool teste = true;
+            if (!mat[i, j]) teste = false;
+            return teste;
+
+        }
         public bool ExistenceVehicule(string immat)
         {
             bool res = false;
@@ -870,11 +1429,229 @@ namespace version_1._0
             {
                 if (c.Immatriculation == v.Immatriculation)
                 {
-                    c.Reserve=false;
+                    c.Reserve = false;
                 }
 
             }
 
+        }
+                                    //ReparationVehicule
+        public void AjoutVehiculeToControleur()
+        {
+            int nbC1=0;
+            int nbC2=0;
+            int nbC3=0;
+            int i=0;
+            controleur c1=null;
+            controleur c2=null;
+            controleur c3=null;
+            
+            foreach( controleur c in listControleur)
+            {
+                if(i==0)
+                {
+                nbC1=c.ListVehicule.Count();
+                 c1=c;
+                i++;
+                }
+                else if(i==1)
+                {
+                    nbC2= c.ListVehicule.Count();
+                     c2=c;
+                    i++;                        
+                }
+                else
+                {
+                    nbC3=c.ListVehicule.Count();
+                    c3=c;
+                }                
+            }            
+                            
+            foreach(vehicule v in listMaintenance)
+            {
+                if(nbC1<nbC2&& nbC1<nbC3)
+                {
+                    c1.ListVehicule.Add(v);
+                }
+                else if(nbC2<nbC1 && nbC2<nbC3)
+                {
+                    c2.ListVehicule.Add(v);                    
+                }
+                else if(nbC3<nbC1 && nbC3<nbC2)
+                {
+                    c2.ListVehicule.Add(v);
+
+                }
+                else
+                {
+                    if(nbC1==nbC2&&nbC1==nbC3)
+                    {
+                        c1.ListVehicule.Add(v);
+                    }
+                   else if(nbC1==nbC2&&nbC1!=nbC3)
+                    {
+                        c2.ListVehicule.Add(v);
+                    }
+                    else if(nbC1==nbC3 && nbC1!=nbC2)
+                    {
+                        c3.ListVehicule.Add(v);
+
+                    }
+                    else
+                    {
+                        c2.ListVehicule.Add(v);                                                
+                    }
+
+                }
+                listMaintenance.Remove(v);           
+            }
+
+        }
+        public void MenuControleur()
+        {
+            Console.WriteLine("Bonjour pouvez vous me donnez votre identifiant ainsi que votre mot de passe");
+            string id=Console.ReadLine();
+            string mdp= Console.ReadLine();
+            controleur C=null;
+            bool verif=false;
+            do
+            {         
+            foreach( controleur c in listControleur)
+            {
+                if(id==c.Identifiant&& mdp==c.Mdp)
+                {
+                    C=c;
+                    verif=true;
+
+                }                
+            }
+            }while(!verif);
+            if(verif)
+            {
+                Console.WriteLine("Voici les véhicules à vérifier: ");  
+            int i=0;
+            List<vehicule> listvehiculeControleur= C.ListVehicule;                
+            foreach(vehicule v in listvehiculeControleur)
+            {
+                Console.WriteLine("Vehicule numéro"+i);                
+                Console.WriteLine( v.AffichageVehiculeclient()+"\n");
+                i++;                
+                    
+            }
+            string annonce="Avez vous modifiez un ou des véhicules?\n0.Non    1.Oui";
+            int choix;
+            do
+            {
+                choix=SecuriteSaisieNombreINT(annonce);
+            }while(verification(choix,0,1));
+            if(choix==1)
+            {
+               annonce="Dite moi qu'elle véhicule avez vous modifiez parmi ce affichez:";
+               int option=0;
+               do
+               {
+                    option= SecuriteSaisieNombreINT(annonce);                                                                                               
+               }while(verification(option,0,i)); 
+               vehicule v=listvehiculeControleur[i];
+               Console.WriteLine("pour les question suivantes veuillez répondre par 1 oui et 0 non");
+              annonce= "avez vous vérifier le bon état des phares?";//les phares, les pneus, la mécanique, les vitres, la propreté du véhicule, la peinture
+                
+                bool[] etat= new bool[5];                    
+                                          
+                do
+                {
+                    annonce="avez vous verifiez le bon êtat des phares";
+                    option=SecuriteSaisieNombreINT(annonce);
+                   etat[0]= ConverIntDouble(option);
+                }while(verification(option,0,1));             
+                do
+                {
+                    annonce="avez vous verifiez le bon êtat des pneus";
+                    option=SecuriteSaisieNombreINT(annonce);
+                    etat[1]=ConverIntDouble(option);
+                }while(verification(option,0,1));
+                do
+                {
+                    annonce="avez vous verifiez le bon êtat des mencanique";
+                    option=SecuriteSaisieNombreINT(annonce);
+                    etat[2]=ConverIntDouble(option);
+                }while(verification(option,0,1));
+                do
+                {
+                    annonce="avez vous verifiez le bon êtat des vitres";
+                    option=SecuriteSaisieNombreINT(annonce);
+                    etat[3]=ConverIntDouble(option);
+                }while(verification(option,0,1));
+                do
+                {
+                    annonce="avez vous verifiez le bon êtat des propreté";
+                    option=SecuriteSaisieNombreINT(annonce);
+                    etat[4]=ConverIntDouble(option);
+                }while(verification(option,0,1));
+                do
+                {
+                    annonce="avez vous verifiez le bon êtat des peinture";
+                    option=SecuriteSaisieNombreINT(annonce);
+                    etat[5]=ConverIntDouble(option);
+                }while(verification(option,0,1));
+                bool teste=true;                
+                for(int j=0;j<etat.Length;j++)
+                {
+                    if(!etat[j])teste=false;                                                                                                        
+                }
+                if(teste)
+                {
+                    v.Reserve=false;
+                    v.Etatvehicule=etat;                    
+                    listMaintenance.Remove(v);
+                    C.ListVehicule=listMaintenance;// faire la mdofication dans les listes
+                    int c=0;
+                    int identif=0;
+                    foreach( vehicule w in ListVehicule)
+                    {
+                        if(w.Immatriculation==v.Immatriculation)
+                        {
+                            identif=c;
+                        }
+                        c++;
+
+                    }
+                    ListVehicule[identif]=v;               
+                }
+                else
+                {
+                    v.Etatvehicule=etat;
+                    int c=0;
+                    int identif=0;
+                     foreach( vehicule w in  C.ListVehicule)
+                    {
+                        if(w.Immatriculation==v.Immatriculation)
+                        {
+                            identif=c;
+                        }
+                        c++;
+                    }
+                    listMaintenance[identif]=v;
+                    C.ListVehicule=listMaintenance;
+                                         
+                }                                                                                                                                                                  
+            }
+            else
+            {
+                Console.WriteLine("au revoir");
+            }  
+        }          
+            
+
+        }
+        public bool ConverIntDouble(int a)
+        {
+            bool choix=false;            
+            if(a==1)
+            {
+                choix=true;                
+            }
+            return choix;            
         }
 
 
@@ -888,8 +1665,8 @@ namespace version_1._0
             }
             else
             {
-                int choix=0;                
-                string annonce = "Voulez-vous ajoutez \n 1) une voiture \n 2) Un camion \n 3) Une moto";                
+                int choix = 0;
+                string annonce = "Voulez-vous ajoutez \n 1) une voiture \n 2) Un camion \n 3) Une moto";
                 choix = SecuriteSaisieNombreINT(annonce);
                 bool menuver = false;
                 menuver = verification(choix, 1, 3);
@@ -899,7 +1676,7 @@ namespace version_1._0
                     choix = SecuriteSaisieNombreINT(annonce);
                     menuver = verification(choix, 1, 3);
 
-                }                
+                }
 
                 switch (choix)
                 {
@@ -929,7 +1706,7 @@ namespace version_1._0
 
         public void AjoutVoiture(string immatriculation)
         {
-            string marque; string modele; int agemin;  string carburant;
+            string marque; string modele; int agemin; string carburant;
             double tarif; int nbplace; string typedepermis; int nbporte; bool climatisation = false;
             string transmission = ""; int capacite; string typeVehicule;
             Console.WriteLine("Quel est le type de la voiture ?");
@@ -937,21 +1714,21 @@ namespace version_1._0
             Console.WriteLine("Qu'elle est la marque de la voiture ?");
             marque = Console.ReadLine();
             Console.WriteLine("Quel est le modèle de la voiture ?");
-            modele = Console.ReadLine();            
-            string annonce = "Quel l'âge minimum pour conduire ce vehicule ?";            
+            modele = Console.ReadLine();
+            string annonce = "Quel l'âge minimum pour conduire ce vehicule ?";
             agemin = SecuriteSaisieNombreINT(annonce);
             Console.WriteLine("Quel est le carburant de la voiture ?");
-            carburant = Console.ReadLine();                   
-            annonce = "Quel est le tarif pour cette voiture ?";           
-            tarif = SecuriteSaisieNombreDOUBLE(annonce);            
-            annonce = "Combien de place possède cette voiture?";            
+            carburant = Console.ReadLine();
+            annonce = "Quel est le tarif pour cette voiture ?";
+            tarif = SecuriteSaisieNombreDOUBLE(annonce);
+            annonce = "Combien de place possède cette voiture?";
             nbplace = SecuriteSaisieNombreINT(annonce);
             Console.WriteLine("Quel type de permis est nécessaire pour conduire cette voiture ?");
-            typedepermis = Console.ReadLine();            
-            annonce = "Combien de porte possède cette voiture ?";            
+            typedepermis = Console.ReadLine();
+            annonce = "Combien de porte possède cette voiture ?";
             nbporte = SecuriteSaisieNombreINT(annonce);
-            int choix = 0;            
-            annonce = "Cette voiture possède-t-elle la climatisation ? \n Tapez 1 pour oui et 2 pour non";            
+            int choix = 0;
+            annonce = "Cette voiture possède-t-elle la climatisation ? \n Tapez 1 pour oui et 2 pour non";
             choix = SecuriteSaisieNombreINT(annonce);
             bool menuver = false;
             menuver = verification(choix, 1, 2);
@@ -975,9 +1752,9 @@ namespace version_1._0
                     Console.WriteLine("Erreure");
                     break;
             }
-            choix = 0;            
-            annonce = "Qu'elle est la transmission de cette voiture ? \n Tapez 1 pour Automatique et 2 pour manuel";            
-            choix = SecuriteSaisieNombreINT( annonce);
+            choix = 0;
+            annonce = "Qu'elle est la transmission de cette voiture ? \n Tapez 1 pour Automatique et 2 pour manuel";
+            choix = SecuriteSaisieNombreINT(annonce);
             menuver = false;
             menuver = verification(choix, 1, 2);
             while (menuver == false)
@@ -999,12 +1776,16 @@ namespace version_1._0
                 default:
                     Console.WriteLine("Erreure");
                     break;
-            }            
-            annonce = "Combien de bagage la voiture peut contenir ?";            
+            }
+            annonce = "Combien de bagage la voiture peut contenir ?";
             capacite = SecuriteSaisieNombreINT(annonce);
+            bool[,] mat = null;
+            Remplissage(ref mat);
+            string[] position = null;
             voiture a = new voiture(immatriculation, marque, modele, agemin, carburant, tarif,
                 nbplace, typedepermis, nbporte, climatisation, capacite, typeVehicule, transmission);
             listVehicule.Add(a);
+            IndiquezPlace(mat, a,position);
 
 
         }
@@ -1013,25 +1794,25 @@ namespace version_1._0
         {
             string marque; string modele; string annonce = "";
             int agemin; string carburant; double tarif; int nbplace; string typedepermis;
-            string typeVehicule; int cylindre=0; int hauteurselle=0; int puissance=0; string transmission="";
+            string typeVehicule; int cylindre = 0; int hauteurselle = 0; int puissance = 0; string transmission = "";
             Console.WriteLine("Quel est le type de la moto?");
             typeVehicule = Console.ReadLine();
             Console.WriteLine("Qu'elle est la marque de la moto ?");
             marque = Console.ReadLine();
             Console.WriteLine("Quel est le modèle de la moto ?");
-            modele = Console.ReadLine();            
-            annonce = "Quel l'âge minimum pour conduire ce vehicule ?";            
+            modele = Console.ReadLine();
+            annonce = "Quel l'âge minimum pour conduire ce vehicule ?";
             agemin = SecuriteSaisieNombreINT(annonce);
             Console.WriteLine("Quel est le carburant de la moto ?");
-            carburant = Console.ReadLine();                       
-            annonce = "Quel est le tarif pour cette moto?";            
-            tarif = SecuriteSaisieNombreDOUBLE(annonce);            
-            annonce = "Combien de place possède cette moto?";            
+            carburant = Console.ReadLine();
+            annonce = "Quel est le tarif pour cette moto?";
+            tarif = SecuriteSaisieNombreDOUBLE(annonce);
+            annonce = "Combien de place possède cette moto?";
             nbplace = SecuriteSaisieNombreINT(annonce);
             Console.WriteLine("Quel type de permis est nécessaire pour conduire cette moto ?");
-            typedepermis = Console.ReadLine();            
-            int choix = 0;           
-            annonce = "Qu'elle est la transmission de cette moto ? \n Tapez 1 pour Automatique et 2 pour manuel";            
+            typedepermis = Console.ReadLine();
+            int choix = 0;
+            annonce = "Qu'elle est la transmission de cette moto ? \n Tapez 1 pour Automatique et 2 pour manuel";
             choix = SecuriteSaisieNombreINT(annonce);
             bool menuver = false;
             menuver = verification(choix, 1, 2);
@@ -1054,16 +1835,16 @@ namespace version_1._0
                 default:
                     Console.WriteLine("Erreure");
                     break;
-            }            
-            annonce = "Combien de cylindre possède cette moto?";            
-            cylindre = SecuriteSaisieNombreINT(annonce);            
-            annonce = "Combien de place cheveaux cette moto?";            
-            puissance = SecuriteSaisieNombreINT(annonce);            
-            annonce = "Qu'elle est la hauteur de la selle de cette moto(en cm)?";            
+            }
+            annonce = "Combien de cylindre possède cette moto?";
+            cylindre = SecuriteSaisieNombreINT(annonce);
+            annonce = "Combien de place cheveaux cette moto?";
+            puissance = SecuriteSaisieNombreINT(annonce);
+            annonce = "Qu'elle est la hauteur de la selle de cette moto(en cm)?";
             hauteurselle = SecuriteSaisieNombreINT(annonce);
 
             moto a = new moto(immatriculation, marque, modele, agemin, carburant, tarif,
-                nbplace, typedepermis,typeVehicule,cylindre,hauteurselle,puissance,transmission );
+                nbplace, typedepermis, typeVehicule, cylindre, hauteurselle, puissance, transmission);
             listVehicule.Add(a);
 
 
@@ -1073,26 +1854,26 @@ namespace version_1._0
         {
             string marque; string modele; string annonce = "";
             int agemin; string carburant; double tarif; int nbplace; string typedepermis;
-            string typeVehicule; double poidcharge=0.0; string dimmensioncharge=""; int poid=0; string transmission="";
-            
+            string typeVehicule; double poidcharge = 0.0; string dimmensioncharge = ""; int poid = 0; string transmission = "";
+
             Console.WriteLine("Quel est le type du camion?");
             typeVehicule = Console.ReadLine();
             Console.WriteLine("Qu'elle est la marque du camion ?");
             marque = Console.ReadLine();
             Console.WriteLine("Quel est le modèle du camion ?");
-            modele = Console.ReadLine();            
-            annonce = "Quel l'âge minimum pour conduire ce vehicule ?";            
+            modele = Console.ReadLine();
+            annonce = "Quel l'âge minimum pour conduire ce vehicule ?";
             agemin = SecuriteSaisieNombreINT(annonce);
             Console.WriteLine("Quel est le carburant du camion ?");
-            carburant = Console.ReadLine();                       
-            annonce = "Quel est le tarif pour ce camion?";            
-            tarif = SecuriteSaisieNombreDOUBLE(annonce);            
-            annonce = "Combien de place possède ce camion?";            
+            carburant = Console.ReadLine();
+            annonce = "Quel est le tarif pour ce camion?";
+            tarif = SecuriteSaisieNombreDOUBLE(annonce);
+            annonce = "Combien de place possède ce camion?";
             nbplace = SecuriteSaisieNombreINT(annonce);
             Console.WriteLine("Quel type de permis est nécessaire pour conduire ce camion ?");
             typedepermis = Console.ReadLine();
-            int choix = 0;            
-            annonce = "Qu'elle est la transmission de ce camion ? \n Tapez 1 pour Automatique et 2 pour manuel";            
+            int choix = 0;
+            annonce = "Qu'elle est la transmission de ce camion ? \n Tapez 1 pour Automatique et 2 pour manuel";
             choix = SecuriteSaisieNombreINT(annonce);
             bool menuver = false;
             menuver = verification(choix, 1, 2);
@@ -1115,22 +1896,22 @@ namespace version_1._0
                 default:
                     Console.WriteLine("Erreure");
                     break;
-            }            
-            annonce = "Qu'elle est là charge utile de ce camion";            
+            }
+            annonce = "Qu'elle est là charge utile de ce camion";
             poidcharge = SecuriteSaisieNombreINT(annonce);
             Console.WriteLine("Qu'elles sont le dimensions possible de la charge(en cm) ?");
-            annonce="Longueur : ";            
+            annonce = "Longueur : ";
             int longueur = SecuriteSaisieNombreINT(annonce);
-            annonce="Largeur : ";            
+            annonce = "Largeur : ";
             int largeur = SecuriteSaisieNombreINT(annonce);
-            annonce="Hauteur : ";            
+            annonce = "Hauteur : ";
             int hauteur = SecuriteSaisieNombreINT(annonce);
-            dimmensioncharge = longueur + "*" + largeur + "*" + hauteur;            
-            annonce = "Quel est le poid du camion (en kg) ?";            
+            dimmensioncharge = longueur + "*" + largeur + "*" + hauteur;
+            annonce = "Quel est le poid du camion (en kg) ?";
             poid = SecuriteSaisieNombreINT(annonce);
 
             camion a = new camion(immatriculation, marque, modele, agemin, carburant, tarif,
-                nbplace, typedepermis, typeVehicule,poidcharge,dimmensioncharge,poid,transmission );
+                nbplace, typedepermis, typeVehicule, poidcharge, dimmensioncharge, poid, transmission);
             listVehicule.Add(a);
 
 
@@ -1142,14 +1923,14 @@ namespace version_1._0
             int cpt = 0;
             Console.WriteLine("Entrez l'immatriculation du véhicule que vous souhaitez consulter");
             string str = Console.ReadLine();
-            while (cpt <= listVehicule.Count-1 && res == false)
+            while (cpt <= listVehicule.Count - 1 && res == false)
             {
                 v = listVehicule[cpt];
                 if (v.Immatriculation == str)
                 {
                     Console.WriteLine(v.ToString());
                     res = true;
-                    
+
                 }
                 cpt++;
             }
@@ -1177,6 +1958,7 @@ namespace version_1._0
                     Console.WriteLine(c.ToString());
                     res = true;
                 }
+                cpt++;
             }
             if (res == false)
             {
@@ -1188,18 +1970,18 @@ namespace version_1._0
         }
         public void SupprimerVehicule()
         {
-            bool res = false;            
+            bool res = false;
             vehicule v;
             int cpt = 0;
             Console.WriteLine("Entrez l'immatriculation du véhicule à supprimer");
-            string str = Console.ReadLine();            
-            while (cpt <= listVehicule.Count-1 && res == false)
+            string str = Console.ReadLine();
+            while (cpt <= listVehicule.Count - 1 && res == false)
             {
                 v = listVehicule[cpt];
                 if (v.Immatriculation == str)
-                {                    
+                {
                     Console.WriteLine(v.ToString());
-                    string annonce="Est-ce bien ce véhicule? \n 1) oui 2)non";
+                    string annonce = "Est-ce bien ce véhicule? \n 1) oui 2)non";
                     int choix = SecuriteSaisieNombreINT(annonce);
                     bool menuver = false;
                     menuver = verification(choix, 1, 2);
@@ -1228,7 +2010,7 @@ namespace version_1._0
                             break;
                     }
 
-                   
+
                 }
                 cpt++;
             }
@@ -1258,12 +2040,12 @@ namespace version_1._0
 
                 } while (res == false);
 
-            }            
+            }
             return value;
 
         }
-        
-        public double SecuriteSaisieNombreDOUBLE( string annonce)
+
+        public double SecuriteSaisieNombreDOUBLE(string annonce)
         {
             bool res = false;
             double value;
@@ -1287,5 +2069,11 @@ namespace version_1._0
 
         }
 
+
+
     }
+
+        
+    
+
 }
