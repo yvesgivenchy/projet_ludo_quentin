@@ -8,56 +8,40 @@ namespace version_1._0
 {
     class Contrat
     {
-        static int nbContrat;
-        private int nbKilométrage;
-        private vehicule vehicule;
-        private Client client;
-        private double CoutTotal;
-        private int identifiant;
-        public Contrat(int nbKilométrage, vehicule vehicule,Client clients, double CoutTotal)
+        //attributs
+        static int id = 0;
+        private int numContrat;
+        private devis devis;
+
+        //constructeur
+        public Contrat(devis devis)
         {
-            this.nbKilométrage = nbKilométrage;
-            this.vehicule = vehicule;
-            client = clients;
-            this.CoutTotal = CoutTotal;
-            identifiant = nbContrat;
-            nbContrat++;
+            this.devis = devis;
+            numContrat = id;
+            id++;
         }
-        public Client Client
+
+        //propriété
+        public int NumContrat
         {
             get
             {
-                return client;
+                return numContrat;
             }
-            set
-            {
-                client = value;
-            }
-
         }
-        public vehicule Vehicule
+        public devis Devis
         {
             get
             {
-                return vehicule;
-            }
-            set
-            {
-                vehicule = value;
+                return devis;
             }
         }
-        public int Identifiant
-        {
-            get
-            {
-                return identifiant;
-            }
 
-        }
-        public void CouTotal()
+        public override string ToString()
         {
-
+            return "Contrat n°" + id + "\n" + devis.ToString();
         }
+
 
 
     }
