@@ -6,167 +6,43 @@ using System.Threading.Tasks;
 
 namespace version_1._0
 {
-    class commande
+    class Contrat
     {
-        //attribut  
+        //attributs
         static int id = 0;
-        private int numCommande;
-        private double nbKilometrage;
-        private vehicule vehicule;
-        private Client client;        
-        private bool autoroute;
-        private string villeDepart;
-        private string villeArrive;
-        private string datedebut;
-        private string datefin;        
-        private bool alleRetour;
+        private int numContrat;
+        private devis devis;
 
-        
         //constructeur
-        public commande(double nbKilometrage, vehicule vehicule, Client client,bool autoroute,string villeDepart,string villeArrive,string datedebut, string datefin,bool alleRetour)
+        public Contrat(devis devis)
         {
-            if (alleRetour == false)
-            {
-                this.nbKilometrage = nbKilometrage;
-            }
-            if (alleRetour == true)
-            {
-                this.nbKilometrage = nbKilometrage * 2;
-            }
-            this.vehicule = vehicule;
-            this.client = client;
-            this.autoroute = autoroute;
-            this.villeDepart = villeDepart;
-            this.villeArrive = villeArrive;
-            this.datedebut = datedebut;
-            this.datefin = datefin;
-            this.alleRetour = alleRetour;          
-            numCommande = id;
+            this.devis = devis;
+            numContrat = id;
             id++;
-           
         }
 
-        //propriete
-        public int NumCommande
+        //propriété
+        public int NumContrat
         {
             get
             {
-                return numCommande;
-            }
-
-        }
-        public double Nbkilometre
-        {
-            get
-            {
-                return nbKilometrage;
-            }
-            set
-            {
-                nbKilometrage = value;
+                return numContrat;
             }
         }
-
-        public Client Client
+        public devis Devis
         {
             get
             {
-                return client;
-            }
-            set
-            {
-                client = value;
-            }
-
-        }
-        public vehicule Vehicule
-        {
-            get
-            {
-                return vehicule;
-            }
-            set
-            {
-                vehicule = value;
-                
-            }
-        }
-        public bool Autoroute
-        {
-            get
-            {
-                return autoroute;
-            }
-            set
-            {
-                autoroute = value;
-            }
-        } 
-        
-        public string VilleDepart
-        {
-            get
-            {
-                return villeDepart;
-            }
-            set
-            {
-                villeDepart = value;
-            }
-        }
-        public string VilleArrive
-        {
-            get
-            {
-                return villeArrive;
-            }
-            set
-            {
-                villeArrive = value;
-            }
-        }
-
-        public string DateDebut
-        {
-            get
-            {
-                return datedebut;
-            }
-            set
-            {
-                datedebut = value;
-            }
-        }
-
-        public string DateFin
-        {
-            get
-            {
-                return datefin;
-            }
-            set
-            {
-                datefin = value;
-            }
-        }
-
-        public bool AlleRetour
-        {
-            get
-            {
-                return alleRetour;
-            }
-            set
-            {
-                alleRetour = value;
+                return devis;
             }
         }
 
         public override string ToString()
         {
-            return "Client : \n" + client.AffichageClient() + "Voiture : \n" + vehicule.AffichageVehiculeclient() + "\n Trajet:" + "\n" + villeDepart + "==>" + villeArrive
-                + "\n Date :" + "\n" + datedebut + "==>" + datefin + "\n Alle/Retour :" + alleRetour;
+            return "Contrat n°" + id + "\n" + devis.ToString();
         }
+
+
 
     }
 }
