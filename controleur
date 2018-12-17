@@ -9,8 +9,8 @@ namespace version_1._0
     class controleur
     {
         private List<vehicule> listVehicule;
-        string identifiant;
-        string mdp;
+        private string identifiant;
+        private string mdp;
         public controleur(string identifiant, string mdp)
         {
             this.identifiant=identifiant;
