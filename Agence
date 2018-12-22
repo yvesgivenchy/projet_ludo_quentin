@@ -3,24 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.IO;
 namespace version_1._0
 {
-    class Agence : Imaintenance
+    class Agence
     {
         private List<vehicule> listVehicule;
         private List<Client> listClient;
         private List<devis> listDevis;
         private List<commande> listCommande;
         private List<Contrat> listContrat;
-        private Maintenance Maintenance;
+
         private List<vehicule> listMaintenance;
         private List<controleur> listControleur;
-        private List<Contrat> listContratPerime;
+        private List<Contrat> listContratArchive;
+        private List<commande> listCommandeArchive;
+        private List<devis> listDevisAchive;
 
         private string login;
         private string mdp;
-        public Agence(Maintenance a, string login, string mdp)
+        public Agence(string login, string mdp)
         {
             listVehicule = new List<vehicule>();
             listClient = new List<Client>();
@@ -29,12 +31,29 @@ namespace version_1._0
             listContrat = new List<Contrat>();
             listMaintenance = new List<vehicule>(listVehicule.Count);
             listControleur = new List<controleur>(3);
-            listContratPerime = new List<Contrat>();
-            Maintenance = a;
+            listContratArchive = new List<Contrat>();
+            listCommandeArchive = new List<commande>();
+            listDevisAchive = new List<devis>();
+
             this.login = login;
             this.mdp = mdp;
 
 
+        }
+        public List<devis> ListDevisArchive
+        {
+            get
+            {
+                return listDevisAchive;
+            }
+        }
+        public List<commande> ListCommandeArchive
+        {
+            get
+            {
+                return listCommandeArchive;
+
+            }
         }
         public List<Contrat> ListContrat
         {
@@ -43,11 +62,11 @@ namespace version_1._0
                 return listContrat;
             }
         }
-        public List<Contrat> ListContratPerime
+        public List<Contrat> ListContratArchive
         {
             get
             {
-                return listContratPerime;
+                return listContratArchive;
             }
         }
         public List<commande> ListCommande
@@ -111,6 +130,947 @@ namespace version_1._0
         }
 
 
+
+        public void StationementVehicule(bool[,] mat, vehicule V, string[] position)// La variable poition sera nul si on vient de crée un véhicule mais sera rempli quand le client rendra le véhicule
+        {
+
+            if (position == null)
+            {
+                for (int i = 0; i < mat.GetLength(0); i++)
+                {
+                    for (int j = 0; j < mat.GetLength(1); j++)
+                    {
+                        if (!mat[i, j])
+                        {
+                            position[0] = Convert.ToString(i);
+                            position[1] = Convert.ToString(j);
+                            Console.WriteLine("La voiture à été garée dans le parking numéro" + position[0] + "à la place numéro A" + position[1]);
+                            mat[i, j] = true;
+                            V.Localisation = position;
+                            // appellée le menu
+                        }
+
+                    }
+                }
+
+            }
+            else
+            {
+                int i = Int32.Parse(position[0]);
+                int j = Int32.Parse(position[1]);
+                if (!mat[i, j])
+                {
+                    mat[i, j] = true;
+                    V.Localisation = position;
+                    Console.WriteLine("La voiture à été garée dans le parking numéro" + position[0] + "à la place numéro A" + position[1]);
+                    // appellée le menuMaintenance
+                }
+                else
+                {
+                    Console.WriteLine("Ils sembleraient que la positin donnée par le client ne soit pas bonne voulez vous recommencez ou voulez vous que je vous donne les places disponibles?");
+                    Console.WriteLine("0.Recommencez     1.Indiquez les positions");
+                    int option = int.Parse(Console.ReadLine());
+                    Console.Clear();
+                    if (option == 0)
+                    {
+                        do
+                        {
+                            Console.WriteLine("Donnez moi le numéro de parking");
+                            int parking = int.Parse(Console.ReadLine());
+                            Console.WriteLine("Donnez moi le numéro de la place");
+                            int place = int.Parse(Console.ReadLine());
+                            if (!VerificationPlace(mat, parking, place))
+                            {
+                                mat[parking, place] = true;
+                                position[0] = Convert.ToString(parking);
+                                position[1] = Convert.ToString(place);
+                                V.Localisation = position;
+                                Console.WriteLine("La voiture à été garée dans le parking numéro" + position[0] + "à la place numéro A" + position[1]);
+
+                                // appellée le menuMaintenance
+                            }
+                            else
+                            {
+                                Console.WriteLine("La place que vous m'avez donnée n'est toujours pas bonne voulez vous recommencez? ou voulez avoir les places disponibles");
+                                option = int.Parse(Console.ReadLine());
+                                Console.Clear();
+                                if (option == 1) IndiquezPlace(mat, V, position);
+                            }
+                        } while (option == 0);
+
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        IndiquezPlace(mat, V, position);
+                    }
+
+                }
+
+            }
+
+
+        }
+        public List<devis> ListDevisAchive
+        {
+            get
+            {
+                return listDevisAchive;
+            }
+        }
+        public void AlerteClient(Client c, vehicule v)
+        {
+            string nom = c.Nom;
+            string prenom = c.Prenom;
+            string immatriculation = v.Immatriculation;
+            string modele = v.Modele;
+
+            Console.WriteLine("Bonjour Monsieur/Madame " + prenom + nom);
+            Console.WriteLine("Nous souhiatons vous informez que le véhicule suivant:\n modéle" + modele + "\n" + immatriculation);
+
+        }
+
+
+        public void EnvoiePositionClient()
+        {
+
+            Console.WriteLine("Donnez moi le Client parmis la liste");
+            int i = 0;
+            foreach (Client w in listClient)
+            {
+                Console.Write(i + w.AffichageClient());
+                i++;
+            }
+            Console.WriteLine("Donnez moi votre choix");
+            int choix;
+            do
+            {
+                choix = int.Parse(Console.ReadLine());
+            } while (verification(choix, 0, i));
+            Client c = listClient[choix];
+            string[] position = new string[2];
+            foreach (commande C in listCommande)// doute si on peut utiliser les objets commandes vu qu'elles ne sont peut être pas vrais
+            {
+                if (C.Client.Identifiant == C.Client.Identifiant)
+                {
+                    position = C.Vehicule.Localisation;
+                }
+            }
+            Console.WriteLine("Bonjour Madame/Monsieur" + c.Nom + c.Prenom);
+            Console.WriteLine("Vous avez accées à votre voiture située au parking" + position[0] + "à la place" + position[1]);
+
+
+        }
+        public void AjoutVehiculeToControleur()
+        {
+            int nbC1 = 0;
+            int nbC2 = 0;
+            int nbC3 = 0;
+            int i = 0;
+            controleur c1 = null;
+            controleur c2 = null;
+            controleur c3 = null;
+
+            foreach (controleur c in listControleur)
+            {
+                if (i == 0)
+                {
+                    nbC1 = c.ListVehicule.Count();
+                    c1 = c;
+                    i++;
+                }
+                else if (i == 1)
+                {
+                    nbC2 = c.ListVehicule.Count();
+                    c2 = c;
+                    i++;
+                }
+                else
+                {
+                    nbC3 = c.ListVehicule.Count();
+                    c3 = c;
+                }
+            }
+            vehicule v1 = null;
+
+            foreach (vehicule v in listMaintenance)
+            {
+                if (nbC1 < nbC2 && nbC1 < nbC3)
+                {
+                    c1.ListVehicule.Add(v);
+                }
+                else if (nbC2 < nbC1 && nbC2 < nbC3)
+                {
+                    c2.ListVehicule.Add(v);
+                }
+                else if (nbC3 < nbC1 && nbC3 < nbC2)
+                {
+                    c2.ListVehicule.Add(v);
+
+                }
+                else
+                {
+                    if (nbC1 == nbC2 && nbC1 == nbC3)
+                    {
+                        c1.ListVehicule.Add(v);
+                    }
+                    else if (nbC1 == nbC2 && nbC1 != nbC3)
+                    {
+                        c2.ListVehicule.Add(v);
+                    }
+                    else if (nbC1 == nbC3 && nbC1 != nbC2)
+                    {
+                        c3.ListVehicule.Add(v);
+
+                    }
+                    else
+                    {
+                        c2.ListVehicule.Add(v);
+                    }
+                    v1 = v;
+
+                }
+            }
+            listMaintenance.Remove(v1);
+
+        }
+
+
+        public void ChargementDonneClient()
+        {
+            try
+            {
+                string str = "";
+                StreamReader sr = new StreamReader("C:\\listclient.csv");
+                string[] tab = new string[20];
+                while (sr.EndOfStream == false)
+                {
+                    str = sr.ReadLine();
+                    if (str != null)
+                    {
+                        tab = str.Split();
+                        int id = Convert.ToInt32(tab[0]); string nom = tab[1]; string prenom = tab[2]; string adresse = tab[3]; string mail = tab[4]; string datenaissance = tab[5];
+                        int obtentionPermis = Convert.ToInt32(tab[6]); string typepermis = tab[7]; bool reserve = Convert.ToBoolean(tab[8]); int agepermis = Convert.ToInt32(tab[9]);
+                        Client c = new Client(nom, prenom, adresse, mail, datenaissance, obtentionPermis, typepermis);
+                        c.Identifiant = id;
+                        c.Reserve = reserve;
+                        c.AgePermis = agepermis;
+                        listClient.Add(c);
+                    }
+
+                }
+
+
+                sr.Close();
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+
+        }
+        public void SauvegardeDonneClient()
+        {
+            try
+            {
+                string str = "";
+                Client c = null;
+                StreamWriter sw = new StreamWriter("C:\\listclient.csv");
+                for (int i = 0; i < listVehicule.Count; i++)
+                {
+                    c = listClient[i];
+                    str = c.Identifiant + ";" + c.Nom + ";" + c.Prenom + ";" + c.Adresse + ";" + c.Mail + ";" + c.DatedeNaissance + ";" + c.Obtentionpermis + ";" + c.TypePermis
+                        + ";" + c.Reserve + ";" + c.AgePermis;
+                    sw.WriteLine(str);
+
+                }
+
+
+                sw.Close();
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+        }
+        public void enregistrementDonneeContrat()
+        {
+            foreach (Contrat c in listContrat)
+            {
+                string fichier = "C:\\listdevis.csv";
+                devis d = c.Devis;
+                commande C = c.Devis.Commande;
+                EcritureFichierDevis(d, fichier);
+                fichier = "C:\\listCommande.csv";
+                EcritureFichierCommande(C, fichier);
+
+            }
+            foreach (Contrat c in listContratArchive)
+            {
+                string fichier = "C:\\listdevisPerime.csv";
+                devis d = c.Devis;
+                commande C = c.Devis.Commande;
+                EcritureFichierDevis(d, fichier);
+                fichier = "C:\\listCommandePerime";
+                EcritureFichierCommande(C, fichier);
+
+            }
+
+        }
+        public void EcritureFichierDevis(devis d, string fichier)
+        {
+            try
+            {
+                StreamWriter sw = new StreamWriter(fichier);// Donné le vrrais nom du fichier devis
+                double CoutotalHT = d.CoutTotalHt;
+                double CoutotalTTC = d.CoutTotalTtc;
+                int numDevis = d.NumDevis;
+                sw.WriteLine(numDevis + ";" + CoutotalHT + ";" + CoutotalTTC);
+                sw.Close();
+            }
+            catch (FileNotFoundException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+
+        }
+        public void EcritureFichierCommande(commande c, string fichier)
+        {
+            try
+            {
+                StreamWriter sw = new StreamWriter(fichier);// Donné le vrrais nom du fichier commande
+                int numCom = c.NumCommande;
+                double nbKilom = c.Nbkilometre;
+                string Immat = c.Vehicule.Immatriculation;
+                int idClient = c.Client.Identifiant;
+                bool autoroute = c.Autoroute;
+                string villDepart = c.VilleDepart;
+                string villeArrive = c.VilleArrive;
+                string dateDebut = c.DateDebut;
+                string dateFin = c.DateFin;
+                bool allerRetour = c.AlleRetour;
+                sw.WriteLine(numCom + ";" + nbKilom + ";" + Immat + ";" + idClient + ";" + autoroute + ";" + villDepart + ";" + villeArrive + ";" + dateDebut + ";" + dateFin + ";" + allerRetour);
+                sw.Close();
+            }
+            catch (FileNotFoundException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+
+        }
+        public void ChargementDonneContrat(string fichier, bool i)// fichier = commande.csv
+        {
+            try
+            {
+                StreamReader sr = new StreamReader(fichier);
+                while (sr.EndOfStream == false)
+                {
+                    string ligne = sr.ReadLine();
+                    if (ligne != null)
+                    {
+                        string[] tab = ligne.Split(';');
+                        int numCom = Convert.ToInt32(tab[0]);
+                        double nbKilom = Convert.ToDouble(tab[1]);
+                        string Immat = tab[2];
+                        int idClient = Convert.ToInt32(tab[3]);
+                        bool autoroute = Convert.ToBoolean(tab[4]);
+                        string villDepart = tab[5];
+                        string villeArrive = tab[6];
+                        string dateDebut = tab[7];
+                        string dateFin = tab[8];
+                        bool allerRetour = Convert.ToBoolean(tab[9]);
+
+                        Client c = ChercherClient(idClient);
+                        vehicule v = ChercherVehicule(Immat);
+                        commande Co = new commande(nbKilom, v, c, autoroute, villDepart, villeArrive, dateDebut, dateFin, allerRetour);
+
+                        if (i)
+                        {
+                            fichier = "C:\\listdevis.csv";
+                        }
+                        else
+                        {
+                            fichier = "C:\\listdevisarchive.csv";
+                        }
+
+                        string[] donne = RechercheDevis(numCom, fichier);
+                        devis d = new devis(Co);
+                        d.CoutTotalHt = Convert.ToDouble(donne[1]);
+                        d.CoutTotalTtc = Convert.ToDouble(donne[2]);
+                        d.NumDevis = numCom;
+
+
+                        Contrat ct = new Contrat(d);
+                        ct.NumContrat = numCom;
+                        if (i)
+                        {
+                            ListCommande.Add(Co);
+                            ListDevis.Add(d);
+                            ListContrat.Add(ct);
+                        }
+                        else
+                        {
+                            listCommandeArchive.Add(Co);
+                            listDevisAchive.Add(d);
+                            ListContratArchive.Add(ct);
+
+                        }
+
+                    }
+
+                }
+                sr.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+        }
+        public Client ChercherClient(int idClient)
+        {
+            Client C = null;
+            foreach (Client c in listClient)
+            {
+                if (c.Identifiant == idClient)
+                {
+                    C = c;
+                    C.Reserve = true;
+                }
+            }
+            return C;
+        }
+        public vehicule ChercherVehicule(string immat)
+        {
+            vehicule v = null;
+            foreach (vehicule c in listVehicule)
+            {
+                if (c.Immatriculation.ToLower() == immat.ToLower())
+                {
+                    v = c;
+                    v.Reserve = true;
+                }
+            }
+
+            return v;
+        }
+        public string[] RechercheDevis(int numCom, string fichier)
+        {
+            string[] donne = null;
+            try
+            {
+                StreamReader sr = new StreamReader(fichier);
+                while (sr.EndOfStream == false)
+                {
+                    string ligne = sr.ReadLine();
+                    if (ligne != null)
+                    {
+                        string[] tab = ligne.Split(';');
+                        if (Convert.ToInt32(tab[0]) == numCom)
+                        {
+                            donne = tab;
+                        }
+                    }
+
+
+
+                }
+                sr.Close();
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            return donne;
+
+        }
+        public void EcritureListMaintenance()
+        {
+            foreach (vehicule v in ListMaintenance)
+            {
+                if (v != null)
+                {
+                    EcritureVehiculeMaintenance(v);
+                }
+
+            }
+        }
+        public void EcritureVehiculeMaintenance(vehicule v)
+        {
+            try
+            {
+
+                StreamWriter sw = new StreamWriter("C:\\listmaintenance.csv");
+                string immatriculation = v.Immatriculation;
+                sw.WriteLine(immatriculation);
+                sw.Close();
+            }
+            catch (FileNotFoundException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+        public void LectureFichierMaintenance()
+        {
+            try
+            {
+                StreamReader sr = new StreamReader("C:\\listmaintenance.csv");
+                while (sr.EndOfStream == false)
+                {
+                    string ligne = sr.ReadLine();
+                    if (ligne != null)
+                    {
+                        vehicule v = ChercherVehicule(ligne);
+                        ListMaintenance.Add(v);
+                    }
+
+                }
+                sr.Close();
+            }
+            catch (FileNotFoundException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+        }
+
+
+        public void ChargementDonneVoiture()
+        {
+            string ligne = "";
+            string temp = "";
+            string[] tab = new string[20];
+            try
+            {
+                StreamReader sr = new StreamReader("C:\\listvoiture.csv");
+
+                while (sr.EndOfStream == false)
+                {
+
+                    ligne = sr.ReadLine();
+                    if (ligne != null)
+                    {
+
+                        tab = ligne.Split(';');
+                        string immatriculation = tab[0]; string marque = tab[1]; string modele = tab[2];
+                        int agemin = Convert.ToInt32(tab[3]); string carburant = tab[4]; double tarif = Convert.ToDouble(tab[5]); int nbplace = Convert.ToInt32(tab[6]); string typedepermis = tab[7];
+                        int nbporte = Convert.ToInt32(tab[8]); bool climatisation = Convert.ToBoolean(tab[9]); int capacite = Convert.ToInt32(tab[10]); string typevehicule = tab[11]; string transmission = tab[12];
+                        voiture v = new voiture(immatriculation, marque, modele, agemin, carburant, tarif, nbplace, typedepermis, nbporte, climatisation, capacite, typevehicule, transmission);
+                        v.DureeMinPermis = Convert.ToInt32(tab[13]);
+                        v.Km = Convert.ToDouble(tab[14]);
+                        temp = tab[15];
+                        string[] tabtemp = new string[6];
+                        tabtemp = temp.Split('/');
+                        for (int i = 0; i < v.Etatvehicule.Length; i++)
+                        {
+                            v.Etatvehicule[i] = Convert.ToBoolean(tabtemp[i]);
+                        }
+                        temp = tab[16];
+                        string[] tabtemp2 = new string[2];
+                        tabtemp2 = temp.Split('|');
+                        for (int i = 0; i < v.Localisation.Length; i++)
+                        {
+                            v.Localisation[i] = tabtemp2[i];
+                        }
+                        v.Reserve = Convert.ToBoolean(tab[17]);
+                        listVehicule.Add(v);
+
+                    }
+
+                }
+                sr.Close();
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+
+        }
+        public void ChargementDonneCamion()
+        {
+            string ligne = "";
+            string temp = "";
+            string[] tab = new string[20];
+            try
+            {
+                StreamReader sr = new StreamReader("C:\\listcamion.csv");
+
+                while (sr.EndOfStream == false)
+                {
+                    ligne = sr.ReadLine();
+                    if (ligne != null)
+                    {
+                        tab = ligne.Split(';');
+                        string immatriculation = tab[0]; string marque = tab[1]; string modele = tab[2];
+                        int agemin = Convert.ToInt32(tab[3]); string carburant = tab[4]; double tarif = Convert.ToDouble(tab[5]); int nbplace = Convert.ToInt32(tab[6]); string typedepermis = tab[7];
+                        string typeVehicule = tab[8]; double poidcharge = Convert.ToDouble(tab[9]); string dimmensioncharge = tab[10]; int poid = Convert.ToInt32(tab[11]); string transmission = tab[12];
+                        camion c = new camion(immatriculation, marque, modele, agemin, carburant, tarif, nbplace, typedepermis, typeVehicule, poidcharge, dimmensioncharge, poid, transmission);
+                        c.DureeMinPermis = Convert.ToInt32(tab[13]);
+                        c.Km = Convert.ToDouble(tab[14]);
+                        temp = tab[15];
+                        string[] tabtemp = new string[6];
+                        tabtemp = temp.Split('/');
+                        for (int i = 0; i < c.Etatvehicule.Length; i++)
+                        {
+                            c.Etatvehicule[i] = Convert.ToBoolean(tabtemp[i]);
+                        }
+                        temp = tab[16];
+                        string[] tabtemp2 = new string[2];
+                        tabtemp2 = temp.Split('|');
+                        for (int i = 0; i < c.Localisation.Length; i++)
+                        {
+                            c.Localisation[i] = tabtemp2[i];
+                        }
+                        c.Reserve = Convert.ToBoolean(tab[17]);
+                        listVehicule.Add(c);
+                    }
+
+
+                }
+                sr.Close();
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+
+        }
+        public void ChargementDonneeMoto()
+        {
+            string ligne = "";
+            string temp = "";
+            string[] tab = new string[20];
+            try
+            {
+                StreamReader sr = new StreamReader("C:\\listmoto.csv");
+
+                while (sr.EndOfStream == false)
+                {
+                    ligne = sr.ReadLine();
+                    if (ligne != null)
+                    {
+                        tab = ligne.Split(';');
+                        string immatriculation = tab[0]; string marque = tab[1]; string modele = tab[2];
+                        int agemin = Convert.ToInt32(tab[3]); string carburant = tab[4]; double tarif = Convert.ToDouble(tab[5]); int nbplace = Convert.ToInt32(tab[6]); string typedepermis = tab[7];
+                        string typeVehicule = tab[8]; int cylindre = Convert.ToInt32(tab[9]); int hauteurselle = Convert.ToInt32(tab[10]); int puissance = Convert.ToInt32(tab[11]); string transmission = tab[12];
+                        moto m = new moto(immatriculation, marque, modele, agemin, carburant, tarif, nbplace, typedepermis, typeVehicule, cylindre, hauteurselle, puissance, transmission);
+                        m.DureeMinPermis = Convert.ToInt32(tab[13]);
+                        m.Km = Convert.ToDouble(tab[14]);
+                        temp = tab[15];
+                        string[] tabtemp = new string[6];
+                        tabtemp = temp.Split('/');
+                        for (int i = 0; i < m.Etatvehicule.Length; i++)
+                        {
+                            m.Etatvehicule[i] = Convert.ToBoolean(tabtemp[i]);
+                        }
+                        temp = tab[16];
+                        string[] tabtemp2 = new string[2];
+                        tabtemp2 = temp.Split('|');
+                        for (int i = 0; i < m.Localisation.Length; i++)
+                        {
+                            m.Localisation[i] = tabtemp2[i];
+                        }
+                        m.Reserve = Convert.ToBoolean(tab[17]);
+                        listVehicule.Add(m);
+                    }
+
+
+                }
+                sr.Close();
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+        }
+        public void SauvegardeDonneVoiture()
+        {
+            try
+            {
+                string str = "";
+                voiture v = null;
+                StreamWriter sw = new StreamWriter("C:\\listvoiture.csv");
+                for (int i = 0; i < listVehicule.Count; i++)
+                {
+                    if (listVehicule[i] is voiture)
+                    {
+                        v = (voiture)listVehicule[i];
+                        if (v != null)
+                        {
+                            string etatveh = "";
+                            string local = "";
+                            for (int j = 0; j < v.Etatvehicule.Length; j++)
+                            {
+                                if (j == v.Etatvehicule.Length - 1)
+                                {
+                                    etatveh += v.Etatvehicule[j];
+                                }
+                                else
+                                {
+                                    etatveh += v.Etatvehicule[j] + "/";
+                                }
+
+
+                            }
+                            for (int h = 0; h < v.Localisation.Length; h++)
+                            {
+                                if (h == v.Localisation.Length - 1)
+                                {
+                                    local += v.Localisation[h];
+                                }
+                                else
+                                {
+                                    local += v.Localisation[h] + "|";
+                                }
+
+                            }
+                            str = v.Immatriculation + ";" + v.Marque + ";" + v.Modele + ";" + v.Agemin + ";" + v.Carburant + ";" + v.Tarif + ";" + v.NbPlace + ";" + v.TypedePermis + ";" + v.Nbporte + ";" + v.Climatisation + ";" +
+                                v.Capacite + ";" + v.TypeVehicule + ";" + v.Transmission + ";" + v.DuereeMinPermis + ";" + v.Km + ";" + etatveh + ";" + local + ";" + v.Reserve;
+                            sw.WriteLine(str);
+
+                        }
+                    }
+
+
+
+                }
+
+
+                sw.Close();
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+        }
+        public void SauvegardeDonneMoto()
+        {
+            try
+            {
+                string str = "";
+                moto m = null;
+                StreamWriter sw = new StreamWriter("C:\\listmoto.csv");
+
+
+                for (int i = 0; i < listVehicule.Count; i++)
+                {
+                    if (listVehicule[i] is moto)
+                    {
+                        m = (moto)listVehicule[i];
+                        if (m != null)
+                        {
+                            string etatveh = "";
+                            string local = "";
+                            for (int j = 0; j < m.Etatvehicule.Length; j++)
+                            {
+                                if (j == m.Etatvehicule.Length - 1)
+                                {
+                                    etatveh += m.Etatvehicule[j];
+                                }
+                                else
+                                {
+                                    etatveh += m.Etatvehicule[j] + "/";
+                                }
+
+
+                            }
+                            for (int h = 0; h < m.Localisation.Length; h++)
+                            {
+                                local += m.Localisation[h] + "|";
+                                if (h == m.Localisation.Length - 1)
+                                {
+                                    local += m.Localisation[h];
+                                }
+                            }
+                            str = m.Immatriculation + ";" + m.Marque + ";" + m.Modele + ";" + m.Agemin + ";" + m.Carburant + ";" + m.Tarif + ";" + m.NbPlace + ";" + m.TypedePermis + ";" +
+                                m.TypeVehicule + ";" + m.Cylindre + ";" + m.HauteurSelle + ";" + m.Puissance + ";" + m.Transmission + ";" + m.DureeMinPermis + ";" + m.Km + ";" + etatveh + ";" + local + ";" + m.Reserve;
+                            sw.WriteLine(str);
+
+                        }
+                    }
+
+
+
+                }
+
+
+                sw.Close();
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+        public void SauvegardeDonneCamion()
+        {
+            try
+            {
+                string str = "";
+                camion c = null;
+                StreamWriter sw = new StreamWriter("C:\\listcamion.csv");
+                for (int i = 0; i < listVehicule.Count; i++)
+                {
+                    if (listVehicule[i] is camion)
+                    {
+                        c = (camion)listVehicule[i];
+                        if (c != null)
+                        {
+                            string etatveh = "";
+                            string local = "";
+                            for (int j = 0; j < c.Etatvehicule.Length; j++)
+                            {
+                                if (j == c.Etatvehicule.Length - 1)
+                                {
+                                    etatveh += c.Etatvehicule[j];
+                                }
+                                else
+                                {
+                                    etatveh += c.Etatvehicule[j] + "/";
+                                }
+
+
+                            }
+                            for (int h = 0; h < c.Localisation.Length; h++)
+                            {
+                                if (h == c.Localisation.Length - 1)
+                                {
+                                    local += c.Localisation[h];
+                                }
+                                else
+                                {
+                                    local += c.Localisation[h] + "|";
+                                }
+
+                            }
+                            str = c.Immatriculation + ";" + c.Marque + ";" + c.Modele + ";" + c.Agemin + ";" + c.Carburant + ";" + c.Tarif + ";" + c.NbPlace + ";" + c.TypedePermis + ";" +
+                                c.TypeVehicule + ";" + c.PoidCharge + ";" + c.Dimmensioncharge + ";" + c.Poid + ";" + c.Transmission + ";" + c.DureeMinPermis + ";" + c.Km + ";" + etatveh + ";" + local + ";" + c.Reserve;
+                            sw.WriteLine(str);
+
+                        }
+
+                    }
+
+
+
+                }
+                sw.Close();
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+        }
+        public void ChargementDonneControleur()
+        {
+            string ligne = "";
+            string[] tab = null;
+
+            try
+            {
+                StreamReader sr = new StreamReader("C:\\listcontroleur.csv");
+                while (sr.EndOfStream == false)
+                {
+                    ligne = sr.ReadLine();
+                    if (ligne != null)
+                    {
+                        tab = ligne.Split(';');
+                        string identifiant = tab[0]; string mdp = tab[1]; string[] veh = tab[2].Split('/');
+                        controleur co = new controleur(identifiant, mdp);
+                        for (int i = 0; i < veh.Length; i++)
+                        {
+                            vehicule v = ChercherVehicule(veh[i]);
+                            co.ListVehicule.Add(v);
+                        }
+                        listControleur.Add(co);
+
+                    }
+
+
+
+                }
+                sr.Close();
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+        public void SauvegardeDonneControleur()
+        {
+            try
+            {
+                StreamWriter sw = new StreamWriter("C:\\listcontroleur.csv");
+                foreach (controleur c in listControleur)
+                {
+                    string id = c.Identifiant;
+                    string mdp = c.Mdp;
+                    string veh = null;
+                    for (int i = 0; i < c.ListVehicule.Count; i++)
+                    {
+                        if (i == c.ListVehicule.Count - 1)
+                        {
+                            veh += c.ListVehicule[i].Immatriculation;
+                        }
+                        else
+                        {
+                            veh += c.ListVehicule[i].Immatriculation + "/";
+                        }
+                    }
+                    sw.WriteLine(id + ";" + mdp + ";" + veh);
+
+                }
+                sw.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+        public void chargementDonnee()
+        {
+
+            ChargementDonneCamion();
+            ChargementDonneeMoto();
+            ChargementDonneVoiture();
+            ChargementDonneClient();
+            ChargementDonneControleur();
+            ChargementDonneContrat("C:\\listcommande.csv", true); //pour les commande classique
+            ChargementDonneContrat("C:\\listcommandearchive.csv", false);// pour les commandes archivées
+            LectureFichierMaintenance();
+
+
+
+        }
+        public void sauvegardeDonne()
+        {
+            SauvegardeDonneCamion();
+            SauvegardeDonneMoto();
+            SauvegardeDonneVoiture();
+            SauvegardeDonneClient();
+            enregistrementDonneeContrat();
+            SauvegardeDonneControleur();
+            EcritureListMaintenance();
+
+        }
         public void CreationContratMenu(Client c)
         {
             if (c.Reserve == false)
@@ -129,6 +1089,7 @@ namespace version_1._0
                     }
 
                 }
+                enregistrementDonneeContrat();
                 Console.WriteLine("Appuyez sur espace");
                 Console.ReadKey();
 
@@ -136,7 +1097,6 @@ namespace version_1._0
 
 
         }
-
         public Client IdclientMenu()
         {
             Client a = null;
@@ -235,6 +1195,10 @@ namespace version_1._0
                 Contrat con = new Contrat(d);
                 listContrat.Add(con);
                 c.Reserve = true;
+                con.Devis.Commande.Vehicule.Km += con.Devis.Commande.Nbkilometre;
+                con.Devis.Commande.Vehicule.Reserve = true;
+                con.Devis.NumDevis = con.NumContrat;
+                con.Devis.Commande.NumCommande = con.NumContrat;
             }
             if (10 <= cpt)
             {
@@ -306,6 +1270,7 @@ namespace version_1._0
 
             A = new Client(nom, prenom, adresse, email, dateNaissance, obtentionpermis, typePermis);
             ListClient.Add(A);
+            SauvegardeDonneClient();
 
 
         }
@@ -348,7 +1313,7 @@ namespace version_1._0
                         {
                             foreach (Client c in ListClient)
                             {
-                                if (c.Nom == a.Nom && c.Prenom == a.Prenom)
+                                if (c.Nom.ToLower() == a.Nom.ToLower() && c.Prenom.ToLower() == a.Prenom.ToLower())
                                 {
                                     if (c.Adresse == adresse)
                                     {
@@ -441,7 +1406,7 @@ namespace version_1._0
         {
 
 
-            vehicule l = null;
+
             string typeVehicule = null;// regarde le type de véhicule
             if (choix == 1)
             {
@@ -474,7 +1439,7 @@ namespace version_1._0
             Console.Clear();
             Console.WriteLine("Que voulez vous comme transmissions");
             string annonce = "0. rien\n1.Automatique\n2.Manuelle";
-            int i = 0;
+
             do
             {
                 opt = SecuriteSaisieNombreINT(annonce);
@@ -499,9 +1464,9 @@ namespace version_1._0
                 RechercheVehicule(ref listVoitureCritere, typeVehicule, transmission, choix);
             }
             opt = -2;
-            Console.WriteLine("Dites moi quel voiture voulez vous prendre?");
+            annonce = "Dites moi quel voiture voulez vous prendre?";
             int j = 0;
-            foreach (voiture h in listVoitureCritere)
+            foreach (vehicule h in listVoitureCritere)
             {
                 if (h != null)
                 {
@@ -511,74 +1476,18 @@ namespace version_1._0
             }
             do
             {
-                opt = int.Parse(Console.ReadLine());
+                opt = SecuriteSaisieNombreINT(annonce);
             } while (!verification(opt, 0, listVoitureCritere.Count));
             Console.Clear();
             Console.WriteLine("Vous venez de changer votre voiture");
             vehicule v = listVoitureCritere[opt];
             return v;
         }
-        /*public void RechercheVoiture(ref List<vehicule> listVoitureCritere, string typeVehicule,string transmission)
-        {
-            int i=0;
-            
 
-            
-            foreach (voiture l in listVehicule)
-            { 
-                if (typeVehicule != null &&transmission!=null)
-                {
-                    if (l.TypeVehicule == typeVehicule&& l.Transmission==transmission )
-                    {
-                        listVoitureCritere.Add(l);
-                       Console.WriteLine(i+l.ToString());
-                        Console.WriteLine("-------------");
-                        i++;
-                    }
-                }
-                else if(typeVehicule != null &&transmission==null||typeVehicule == null &&transmission!=null)
-                {
-                    if(typeVehicule != null)
-                    {
-                        if (l.TypeVehicule == typeVehicule)
-                        {
-                        listVoitureCritere.Add(l);
-                       Console.WriteLine(i+l.ToString());
-                        Console.WriteLine("-------------");
-                        i++;
-                        }
-                    }   
-                    else
-                    {
-                            if ( l.Transmission==transmission )
-                            {
-                            listVoitureCritere.Add(l);
-                            Console.WriteLine(i+l.ToString());
-                            Console.WriteLine("-------------");
-                            i++;
-                            }
-
-                    }
-                }
-                else
-                {
-                    listVoitureCritere.Add(l);
-                    
-                    Console.WriteLine(i+l.ToString());
-                        Console.WriteLine("-------------");
-                        i++; 
-                        
-
-                }
-
-
-            }
-            
-        }*/
 
         public void RechercheVehicule(ref List<vehicule> listVoitureCritere, string typeVehicule, string transmission, int choix)
         {
-            int i = 0;
+
             foreach (vehicule l in listVehicule)
             {
                 if (!l.Reserve)
@@ -587,7 +1496,7 @@ namespace version_1._0
                     {
                         if (typeVehicule != null && transmission != null)
                         {
-                            if (l.TypeVehicule == typeVehicule && l.Transmission == transmission && !l.Reserve)
+                            if (l.TypeVehicule.ToLower() == typeVehicule.ToLower() && l.Transmission.ToLower() == transmission.ToLower() && !l.Reserve)
                             {
 
                                 listVoitureCritere.Add(l);
@@ -600,14 +1509,14 @@ namespace version_1._0
                         {
                             if (typeVehicule != null && !l.Reserve)
                             {
-                                if (l.TypeVehicule == typeVehicule && !l.Reserve)
+                                if (l.TypeVehicule.ToLower() == typeVehicule.ToLower() && !l.Reserve)
                                 {
                                     listVoitureCritere.Add(l);
                                 }
                             }
                             else
                             {
-                                if (l.Transmission == transmission && !l.Reserve)
+                                if (l.Transmission.ToLower() == transmission.ToLower() && !l.Reserve)
                                 {
                                     listVoitureCritere.Add(l);
                                 }
@@ -628,117 +1537,16 @@ namespace version_1._0
 
             }
         }
-        /*public void RechercheMoto(ref List<vehicule> listVoitureCritere, string typeVehicule,string transmission)
-        {
-            int i=0;
-            foreach (moto l in listVehicule)
-            { 
-                if (typeVehicule != null &&transmission!=null)
-                {
-                    if (l.TypeVehicule == typeVehicule&& l.Transmission==transmission )
-                    {
-                        listVoitureCritere.Add(l);
-                        Console.WriteLine(i+l.ToString());
-                        Console.WriteLine("-------------");
-                        i++;
-                    }
-                }
-                else if(typeVehicule != null &&transmission==null||typeVehicule == null &&transmission!=null)
-                {
-                    if(typeVehicule != null)
-                    {
-                        if (l.TypeVehicule == typeVehicule)
-                        {
-                        listVoitureCritere.Add(l);
-                        Console.WriteLine(i+l.ToString());
-                        Console.WriteLine("-------------");
-                        i++;
-                        }
-                    }   
-                    else
-                    {
-                            if ( l.Transmission==transmission )
-                            {
-                            listVoitureCritere.Add(l);
-                            Console.WriteLine(i+l.ToString());
-                            Console.WriteLine("-------------");
-                            i++;
-                            }
 
-                    }
-                }
-                else
-                {
-                    Console.WriteLine(i+l.ToString());
-                        Console.WriteLine("-------------");
-                        i++; 
-
-                }
-
-
-            }
-        }
-        
-        public void RechercheCamion(ref List<vehicule> listVoitureCritere, string typeVehicule,string transmission)
-        {
-        int i=0;
-            foreach (moto l in listVehicule)
-            { 
-                if (typeVehicule != null &&transmission!=null)
-                {
-                    if (l.TypeVehicule == typeVehicule&& l.Transmission==transmission )
-                    {
-                        listVoitureCritere.Add(l);
-                        Console.WriteLine(i+l.ToString());
-                        Console.WriteLine("-------------");
-                        i++;
-                    }
-                }
-                else if(typeVehicule != null &&transmission==null||typeVehicule == null &&transmission!=null)
-                {
-                    if(typeVehicule != null)
-                    {
-                        if (l.TypeVehicule == typeVehicule)
-                        {
-                        listVoitureCritere.Add(l);
-                        Console.WriteLine(i+l.ToString());
-                        Console.WriteLine("-------------");
-                        i++;
-                        }
-                    }   
-                    else
-                    {
-                            if ( l.Transmission==transmission )
-                            {
-                            listVoitureCritere.Add(l);
-                            Console.WriteLine(i+l.ToString());
-                            Console.WriteLine("-------------");
-                            i++;
-                            }
-
-                    }
-                }
-                else
-                {
-                    Console.WriteLine(i+l.ToString());
-                        Console.WriteLine("-------------");
-                        i++; 
-
-                }
-
-
-            }
-            
-        }*/
 
         public commande CreationCommande(Client c)
         {
             Console.Clear();
             List<vehicule> listVoitureCritere = new List<vehicule>(listVehicule.Count);
             bool teste = c.Reserve;
-            commande commande = null;
+
             vehicule v = null;
-            vehicule v2 = null;
+
             Console.WriteLine("Nouvelle commande");
             string annonce = "Donnez moi le type de vehicule que vous voulez prendre:\n1.Voiture\n2.Moto\n3.Camion";
             int option = 0;
@@ -752,7 +1560,7 @@ namespace version_1._0
             {
                 case 1:
                     {
-                        if (c.TypePermis == "B" || c.TypePermis == "BE")
+                        if (c.TypePermis.ToUpper() == "B" || c.TypePermis.ToUpper() == "BE")
                         {
                             v = ChoixVoiture(listVoitureCritere, option, c);
                         }
@@ -764,7 +1572,7 @@ namespace version_1._0
                     break;
                 case 2:
                     {
-                        if (c.TypePermis == "A1" || c.TypePermis == "A2")
+                        if (c.TypePermis.ToUpper() == "A1" || c.TypePermis.ToUpper() == "A2")
                         {
                             v = ChoixVoiture(listVoitureCritere, option, c);
                         }
@@ -776,7 +1584,7 @@ namespace version_1._0
                     break;
                 case 3:
                     {
-                        if (c.TypePermis == "C" || c.TypePermis == "C1" || c.TypePermis == "C1E")
+                        if (c.TypePermis.ToUpper() == "C" || c.TypePermis.ToUpper() == "C1" || c.TypePermis.ToUpper() == "C1E")
                         {
                             v = ChoixVoiture(listVoitureCritere, option, c);
                         }
@@ -861,30 +1669,30 @@ namespace version_1._0
             List<vehicule> listVoitureCritére = new List<vehicule>(listVehicule.Count);
             commande commande = null;
             vehicule v = null;
-            vehicule v2;
+
             if (d.Commande.Client == c)
             {
 
                 Console.WriteLine("Le devis ne vous convient pas ?");
                 v = commande.Vehicule;
-                Console.WriteLine("Que voulez vous faire?");
-                Console.WriteLine("1.Modifiez la voiture\n 2.Modifiez le nb de kilométrage\n 3.Modifiez Allé/Retour\n 4. Modifiez autoroute");// choix de modification
+                string annonce = "Que voulez vous faire?\n 1.Modifiez la voiture\n 2.Modifiez le nb de kilométrage\n 3.Modifiez Allé/Retour\n 4. Modifiez autoroute";// choix de modification
                 int choix;
                 do
                 {
-                    choix = int.Parse(Console.ReadLine());
+                    Console.Clear();
+                    choix = SecuriteSaisieNombreINT(annonce);
                 } while (!verification(choix, 1, 2));
                 switch (choix)
                 {
                     case 1:
                         Console.Clear();
                         Console.WriteLine("Que voulez vous comme type de voiture");
-                        Console.WriteLine("1.Voiture\n 2.Moto\n3.Camion"); // choix du type de voiture 
+                        string annonc = "1.Voiture\n 2.Moto\n3.Camion"; // choix du type de voiture 
 
-                        int option = int.Parse(Console.ReadLine());
+                        int option = 0;
                         while (!verification(option, 1, 3))
                         {
-                            option = int.Parse(Console.ReadLine());
+                            option = SecuriteSaisieNombreINT(annonc);
                         }
                         switch (option)
                         {
@@ -897,7 +1705,7 @@ namespace version_1._0
                                 }
                                 else
                                 {
-                                    if (c.TypePermis == "B" || c.TypePermis == "BE")
+                                    if (c.TypePermis.ToUpper() == "B" || c.TypePermis.ToUpper() == "BE")
                                     {
                                         ChangmentReserve(v);
                                         v = ChoixVoiture(listVoitureCritére, choix, c);
@@ -919,7 +1727,7 @@ namespace version_1._0
                                     v = ChoixVoiture(listVoitureCritére, choix, c);
                                     d.Commande.Vehicule = v;
                                 }
-                                else if (c.TypePermis == "A1" || c.TypePermis == "A2")
+                                else if (c.TypePermis.ToUpper() == "A1" || c.TypePermis.ToUpper() == "A2")
                                 {
                                     ChangmentReserve(v);
                                     v = ChoixVoiture(listVoitureCritére, choix, c);
@@ -940,7 +1748,7 @@ namespace version_1._0
                                 }
                                 else
                                 {
-                                    if (c.TypePermis == "C" || c.TypePermis == "C1" || c.TypePermis == "C1E")
+                                    if (c.TypePermis.ToUpper() == "C" || c.TypePermis.ToUpper() == "C1" || c.TypePermis.ToUpper() == "C1E")
                                     {
                                         ChangmentReserve(v);
                                         v = ChoixVoiture(listVoitureCritére, choix, c);
@@ -961,8 +1769,8 @@ namespace version_1._0
                         break;
 
                     case 2:// cas ou il veut modifier son kilométrage
-                        string annonce = "Donnez moi le nouveau kilométrage";
-                        double nbKilom = SecuriteSaisieNombreDOUBLE(annonce);
+                        string annoncee = "Donnez moi le nouveau kilométrage";
+                        double nbKilom = SecuriteSaisieNombreDOUBLE(annoncee);
                         d.Commande.Nbkilometre = nbKilom;
                         break;
 
@@ -1141,7 +1949,7 @@ namespace version_1._0
                     foreach (vehicule c in listVehicule)
                     {
                         string[] localisation = c.Localisation;
-                        if (i == Convert.ToInt32(localisation[0]) && j == Convert.ToInt32(localisation[1]))
+                        if (i == Convert.ToInt32(localisation[0]) && j == Convert.ToInt32(localisation[1]) && c.Reserve == false)
                         {
                             mat[i, j] = true;
                             voiture = true;
@@ -1177,7 +1985,7 @@ namespace version_1._0
         {
             foreach (vehicule w in ListVehicule)
             {
-                if (v.Immatriculation == w.Immatriculation)
+                if (v.Immatriculation.ToLower() == w.Immatriculation.ToLower())
                 {
                     w.Reserve = false;
                 }
@@ -1198,68 +2006,22 @@ namespace version_1._0
         {
             listMaintenance.Add(v);
         }
-        public void SupressionContrat(Contrat c)
+        public void ArchivageContrat(Contrat c)
         {
             int numerodevis = 0;
-            int numerocommande = 0;
             foreach (Contrat cc in listContrat)
             {
                 if (cc.NumContrat == c.NumContrat)
                 {
                     numerodevis = cc.Devis.NumDevis;
+                    listContratArchive.Add(cc);
                     listContrat.Remove(cc);
                 }
 
             }
-            foreach (devis dd in listDevis)
-            {
-                if (dd.NumDevis == numerodevis)
-                {
-                    numerocommande = dd.Commande.NumCommande;
-                    listDevis.Remove(dd);
-                }
-
-            }
-            foreach (commande cco in listCommande)
-            {
-                if (cco.NumCommande == numerocommande)
-                {
-
-                    listCommande.Remove(cco);
-                }
-
-            }
 
         }
-        public void EnvoiePositionClient()
-        {
-            Console.WriteLine("Donnez moi le Client parmis la liste");
-            int i = 0;
-            foreach (Client w in ListClient)
-            {
-                Console.Write(i + w.AffichageClient());
-                i++;
-            }
-            Console.WriteLine("Donnez moi votre choix");
-            int choix;
-            do
-            {
-                choix = int.Parse(Console.ReadLine());
-            } while (verification(choix, 0, i));
-            Client c = listClient[choix];
-            string[] position = new string[2];
-            foreach (commande C in listCommande)// doute si on peut utiliser les objets commandes vu qu'elles ne sont peut être pas vrais
-            {
-                if (C.Client.Identifiant == C.Client.Identifiant)
-                {
-                    position = C.Vehicule.Localisation;
-                }
-            }
-            Console.WriteLine("Bonjour Madame/Monsieur" + c.Nom + c.Prenom);
-            Console.WriteLine("Vous avez accées à votre voiture située au parking" + position[0] + "à la place" + position[1]);
 
-
-        }
         public bool VerificationDate(string dateDebut)
         {
             string[] dateDEbut = dateDebut.Split('/');
@@ -1297,101 +2059,13 @@ namespace version_1._0
             return teste;
         }
 
-        public void StationementVehicule(bool[,] mat, vehicule V, string[] position)// La variable poition sera nul si on vient de crée un véhicule mais sera rempli quand le client rendra le véhicule
-        {
-            if (position == null)
-            {
-                for (int i = 0; i < mat.GetLength(0); i++)
-                {
-                    for (int j = 0; j < mat.GetLength(1); j++)
-                    {
-                        if (!mat[i, j])
-                        {
-                            position[0] = Convert.ToString(i);
-                            position[1] = Convert.ToString(j);
-                            Console.WriteLine("La voiture à été garée dans le parking numéro" + position[0] + "à la place numéro A" + position[1]);
-                            mat[i, j] = true;
-                            V.Localisation = position;
-                            // appellée le menu
-                        }
-
-                    }
-                }
-
-            }
-            else
-            {
-                int i = Int32.Parse(position[0]);
-                int j = Int32.Parse(position[1]);
-                if (!mat[i, j])
-                {
-                    mat[i, j] = true;
-                    V.Localisation = position;
-                    Console.WriteLine("La voiture à été garée dans le parking numéro" + position[0] + "à la place numéro A" + position[1]);
-                    // appellée le menuMaintenance
-                }
-                else
-                {
-                    Console.WriteLine("Ils sembleraient que la positin donnée par le client ne soit pas bonne voulez vous recommencez ou voulez vous que je vous donne les places disponibles?");
-                    Console.WriteLine("0.Recommencez     1.Indiquez les positions");
-                    int option = int.Parse(Console.ReadLine());
-                    Console.Clear();
-                    if (option == 0)
-                    {
-                        do
-                        {
-                            Console.WriteLine("Donnez moi le numéro de parking");
-                            int parking = int.Parse(Console.ReadLine());
-                            Console.WriteLine("Donnez moi le numéro de la place");
-                            int place = int.Parse(Console.ReadLine());
-                            if (!VerificationPlace(mat, parking, place))
-                            {
-                                mat[parking, place] = true;
-                                position[0] = Convert.ToString(parking);
-                                position[1] = Convert.ToString(place);
-                                V.Localisation = position;
-                                Console.WriteLine("La voiture à été garée dans le parking numéro" + position[0] + "à la place numéro A" + position[1]);
-
-                                // appellée le menuMaintenance
-                            }
-                            else
-                            {
-                                Console.WriteLine("La place que vous m'avez donnée n'est toujours pas bonne voulez vous recommencez? ou voulez avoir les places disponibles");
-                                option = int.Parse(Console.ReadLine());
-                                Console.Clear();
-                                if (option == 1) IndiquezPlace(mat, V, position);
-                            }
-                        } while (option == 0);
-
-                    }
-                    else
-                    {
-                        Console.Clear();
-                        IndiquezPlace(mat, V, position);
-                    }
-
-                }
-
-            }
 
 
-        }
-        public void AlerteClient(Client c, vehicule v)
-        {
-            string nom = c.Nom;
-            string prenom = c.Prenom;
-            string immatriculation = v.Immatriculation;
-            string modele = v.Modele;
-
-            Console.WriteLine("Bonjour Monsieur/Madame " + prenom + nom);
-            Console.WriteLine("Nous souhiatons vous informez que le véhicule suivant:\n modéle" + modele + "\n" + immatriculation);
-
-        }
         public void IndiquezPlace(bool[,] mat, vehicule V, string[] position)
         {
             Console.Clear();
             int[] tab = new int[21];
-            int w = 0;
+            int w = 1;
             int i;
             for (i = 0; i < mat.GetLength(0); i++)
             {
@@ -1401,31 +2075,32 @@ namespace version_1._0
 
                 }
                 tab[i] = w;
-                w = 0;
+                w = 1;
             }
             for (i = 0; i < tab.Length; i++)
             {
-                Console.WriteLine("Dans le parking numéro" + i + 1 + "il reste" + tab[i] + "place(s)");
+                Console.WriteLine("Dans le parking numéro " + (i + 1) + " il reste " + tab[i] + " place(s)");
             }
-            Console.WriteLine("Donnez moi le parking que vous voulez ");
-            int parking = int.Parse(Console.ReadLine());
+            string annonce = "Donnez moi le parking que vous voulez ";
+            int parking = SecuriteSaisieNombreINT(annonce);
+            parking = parking - 1;
             bool teste = false;
             for (int k = 0; k < mat.GetLength(1); k++)
             {
-                if (!mat[parking, k])
+                if (!mat[parking, k] && !teste)
                 {
                     mat[parking, k] = true;
                     position[0] = Convert.ToString(parking);
                     position[1] = Convert.ToString(k);
                     V.Localisation = position;
                     teste = true;
-                    Console.WriteLine("La voiture à été garée dans le parking numéro" + position[0] + "à la place numéro A" + position[1]);
+                    Console.WriteLine("La voiture à été garée dans le parking numéro" + (position[0] + 1) + "à la place numéro A" + position[1]);
                     //RetourMenuMaintenance
                 }
             }
             if (!teste)
             {
-                Console.WriteLine("LA place donnée n'est toujours pas bonne nous devons recommencez");
+                Console.WriteLine("La place donnée n'est toujours pas bonne nous devons recommencez");
                 IndiquezPlace(mat, V, position);
             }
 
@@ -1445,7 +2120,7 @@ namespace version_1._0
             bool res = false;
             foreach (vehicule c in listVehicule)
             {
-                if (c.Immatriculation == immat)
+                if (c.Immatriculation.ToLower() == immat.ToLower())
                 {
                     res = true;
                 }
@@ -1458,7 +2133,7 @@ namespace version_1._0
         {
             foreach (vehicule c in listVehicule)
             {
-                if (c.Immatriculation == v.Immatriculation)
+                if (c.Immatriculation.ToLower() == v.Immatriculation.ToLower())
                 {
                     c.Reserve = false;
                 }
@@ -1467,79 +2142,7 @@ namespace version_1._0
 
         }
         //ReparationVehicule
-        public void AjoutVehiculeToControleur()
-        {
-            int nbC1 = 0;
-            int nbC2 = 0;
-            int nbC3 = 0;
-            int i = 0;
-            controleur c1 = null;
-            controleur c2 = null;
-            controleur c3 = null;
 
-            foreach (controleur c in listControleur)
-            {
-                if (i == 0)
-                {
-                    nbC1 = c.ListVehicule.Count();
-                    c1 = c;
-                    i++;
-                }
-                else if (i == 1)
-                {
-                    nbC2 = c.ListVehicule.Count();
-                    c2 = c;
-                    i++;
-                }
-                else
-                {
-                    nbC3 = c.ListVehicule.Count();
-                    c3 = c;
-                }
-            }
-            vehicule v1 = null;
-
-            foreach (vehicule v in listMaintenance)
-            {
-                if (nbC1 < nbC2 && nbC1 < nbC3)
-                {
-                    c1.ListVehicule.Add(v);
-                }
-                else if (nbC2 < nbC1 && nbC2 < nbC3)
-                {
-                    c2.ListVehicule.Add(v);
-                }
-                else if (nbC3 < nbC1 && nbC3 < nbC2)
-                {
-                    c2.ListVehicule.Add(v);
-
-                }
-                else
-                {
-                    if (nbC1 == nbC2 && nbC1 == nbC3)
-                    {
-                        c1.ListVehicule.Add(v);
-                    }
-                    else if (nbC1 == nbC2 && nbC1 != nbC3)
-                    {
-                        c2.ListVehicule.Add(v);
-                    }
-                    else if (nbC1 == nbC3 && nbC1 != nbC2)
-                    {
-                        c3.ListVehicule.Add(v);
-
-                    }
-                    else
-                    {
-                        c2.ListVehicule.Add(v);
-                    }
-                    v1 = v;
-
-                }              
-            }
-            listMaintenance.Remove(v1);
-
-        }
         public void MenuControleur()
         {
             Console.WriteLine("Bonjour pouvez vous me donnez votre identifiant ainsi que votre mot de passe");
@@ -1551,7 +2154,7 @@ namespace version_1._0
             {
                 foreach (controleur c in listControleur)
                 {
-                    if (id == c.Identifiant && mdp == c.Mdp)
+                    if (id.ToLower() == c.Identifiant.ToLower() && mdp.ToLower() == c.Mdp.ToLower())
                     {
                         C = c;
                         verif = true;
@@ -1584,7 +2187,7 @@ namespace version_1._0
                     do
                     {
                         option = SecuriteSaisieNombreINT(annonce);
-                    } while (!verification(option, 0, i-1));
+                    } while (!verification(option, 0, i - 1));
                     vehicule v = listvehiculeControleur[option];
                     Console.WriteLine("pour les question suivantes veuillez répondre par 1 oui et 0 non");
                     annonce = "avez vous vérifier le bon état des phares?";//les phares, les pneus, la mécanique, les vitres, la propreté du véhicule, la peinture
@@ -1636,8 +2239,8 @@ namespace version_1._0
                     {
                         v.Reserve = false;
                         v.Etatvehicule = etat;
-                        listMaintenance.Remove(v);
-                        C.ListVehicule = listMaintenance;// faire la modification dans les listes
+                        listvehiculeControleur.Remove(v);
+                        C.ListVehicule = listvehiculeControleur;// faire la modification dans les listes
                         int c = 0;
                         int identif = 0;
                         foreach (vehicule w in ListVehicule)
@@ -1658,13 +2261,13 @@ namespace version_1._0
                         int identif = 0;
                         foreach (vehicule w in C.ListVehicule)
                         {
-                            if (w.Immatriculation == v.Immatriculation)
+                            if (w.Immatriculation.ToLower() == v.Immatriculation.ToLower())
                             {
                                 identif = c;
                             }
                             c++;
                         }
-                        
+
                         C.ListVehicule[identif] = v;
 
                     }
@@ -1699,7 +2302,7 @@ namespace version_1._0
             else
             {
                 int choix = 0;
-                string annonce = "Voulez-vous ajoutez \n 1) une voiture \n 2) Un camion \n 3) Une moto";
+                string annonce = "Voulez-vous ajoutez \n 1) une voiture \n 2) Une moto \n 3) Un camion";
                 choix = SecuriteSaisieNombreINT(annonce);
                 bool menuver = false;
                 menuver = verification(choix, 1, 3);
@@ -1739,31 +2342,103 @@ namespace version_1._0
 
         public void AjoutVoiture(string immatriculation)
         {
-            string marque; string modele; int agemin; string carburant;
-            double tarif; int nbplace; string typedepermis; int nbporte; bool climatisation = false;
-            string transmission = ""; int capacite; string typeVehicule;
-            Console.WriteLine("Quel est le type de la voiture ?");
-            typeVehicule = Console.ReadLine();
+            string marque; string modele; int agemin; string carburant = "";
+            double tarif; int nbplace; string typedepermis = ""; int nbporte; bool climatisation = false;
+            string transmission = ""; int capacite; string typeVehicule = "";
+            bool menuver = false; int choix = 0;
+            string annonce = "Quel est le type de la voiture ? \n 1. Berline \n 2.Break \n 3.SUV \n 4.Monospace \n 5.Voiture de Sport";
+            menuver = verification(choix, 1, 5);
+            while (menuver == false)
+            {
+                Console.Clear();
+                choix = SecuriteSaisieNombreINT(annonce);
+                menuver = verification(choix, 1, 5);
+
+            }
+
+            switch (choix)
+            {
+                case 1:
+                    typeVehicule = "Berline";
+                    break;
+                case 2:
+                    typeVehicule = "Break";
+                    break;
+                case 3:
+                    typeVehicule = "SUV";
+                    break;
+                case 4:
+                    typeVehicule = "Monospace";
+                    break;
+                case 5:
+                    typeVehicule = "Voiture de Sport";
+                    break;
+
+                default:
+                    Console.WriteLine("Erreure");
+                    break;
+            }
             Console.WriteLine("Qu'elle est la marque de la voiture ?");
             marque = Console.ReadLine();
             Console.WriteLine("Quel est le modèle de la voiture ?");
             modele = Console.ReadLine();
-            string annonce = "Quel l'âge minimum pour conduire ce vehicule ?";
+            annonce = "Quel l'âge minimum pour conduire ce vehicule ?";
             agemin = SecuriteSaisieNombreINT(annonce);
-            Console.WriteLine("Quel est le carburant de la voiture ?");
-            carburant = Console.ReadLine();
+            annonce = "Quel est le carburant de la voiture ? \n 1.Essence \n 2.Diesel";
+            choix = 0;
+            menuver = false;
+            menuver = verification(choix, 1, 2);
+            while (menuver == false)
+            {
+                Console.Clear();
+                choix = SecuriteSaisieNombreINT(annonce);
+                menuver = verification(choix, 1, 2);
+
+            }
+
+            switch (choix)
+            {
+                case 1:
+                    carburant = "essence";
+                    break;
+                case 2:
+                    carburant = "diesel";
+                    break;
+                default:
+                    Console.WriteLine("Erreure");
+                    break;
+            }
             annonce = "Quel est le tarif pour cette voiture ?";
             tarif = SecuriteSaisieNombreDOUBLE(annonce);
             annonce = "Combien de place possède cette voiture?";
             nbplace = SecuriteSaisieNombreINT(annonce);
-            Console.WriteLine("Quel type de permis est nécessaire pour conduire cette voiture ?");
-            typedepermis = Console.ReadLine();
+            annonce = "Quel type de permis est nécessaire pour conduire cette voiture \n 1. B";
+            choix = 0;
+            menuver = false;
+            menuver = verification(choix, 1, 1);
+            while (menuver == false)
+            {
+                Console.Clear();
+                choix = SecuriteSaisieNombreINT(annonce);
+                menuver = verification(choix, 1, 1);
+
+            }
+
+            switch (choix)
+            {
+                case 1:
+                    typedepermis = "B";
+                    break;
+
+                default:
+                    Console.WriteLine("Erreure");
+                    break;
+            }
             annonce = "Combien de porte possède cette voiture ?";
             nbporte = SecuriteSaisieNombreINT(annonce);
-            int choix = 0;
+            choix = 0;
             annonce = "Cette voiture possède-t-elle la climatisation ? \n Tapez 1 pour oui et 2 pour non";
-            choix = SecuriteSaisieNombreINT(annonce);
-            bool menuver = false;
+            menuver = false;
             menuver = verification(choix, 1, 2);
             while (menuver == false)
             {
@@ -1812,13 +2487,15 @@ namespace version_1._0
             }
             annonce = "Combien de bagage la voiture peut contenir ?";
             capacite = SecuriteSaisieNombreINT(annonce);
-            bool[,] mat = null;
-            Remplissage(ref mat);
-            string[] position = null;
             voiture a = new voiture(immatriculation, marque, modele, agemin, carburant, tarif,
                 nbplace, typedepermis, nbporte, climatisation, capacite, typeVehicule, transmission);
-            listVehicule.Add(a);
+            bool[,] mat = new bool[21, 9];
+            Remplissage(ref mat);
+            string[] position = new string[2];
             IndiquezPlace(mat, a, position);
+            listVehicule.Add(a);
+            SauvegardeDonneVoiture();
+
 
 
         }
@@ -1826,28 +2503,81 @@ namespace version_1._0
         public void AjoutMoto(string immatriculation)
         {
             string marque; string modele; string annonce = "";
-            int agemin; string carburant; double tarif; int nbplace; string typedepermis;
-            string typeVehicule; int cylindre = 0; int hauteurselle = 0; int puissance = 0; string transmission = "";
-            Console.WriteLine("Quel est le type de la moto?");
-            typeVehicule = Console.ReadLine();
+            int agemin; string carburant = ""; double tarif; int nbplace; string typedepermis = "";
+            string typeVehicule = ""; int cylindre = 0; int hauteurselle = 0; int puissance = 0; string transmission = "";
+            int choix = 0;
+            annonce = "Quel est le type de la moto? \n 1.Scooter \n 2.Maxi trail \n 3.moto sport \n 4.moto tout terrain\n 5.Maxi Scooter";
+            bool menuver = false;
+            while (menuver == false)
+            {
+                Console.Clear();
+                choix = SecuriteSaisieNombreINT(annonce);
+                menuver = verification(choix, 1, 5);
+
+            }
+
+            switch (choix)
+            {
+                case 1:
+                    typeVehicule = "Scooter";
+                    break;
+                case 2:
+                    typeVehicule = "Maxi trail";
+                    break;
+                case 3:
+                    typeVehicule = "moto sport";
+                    break;
+                case 4:
+                    typeVehicule = "moto tout terrain";
+                    break;
+                case 5:
+                    typeVehicule = "Maxi Scooter";
+                    break;
+
+                default:
+                    Console.WriteLine("Erreure");
+                    break;
+            }
             Console.WriteLine("Qu'elle est la marque de la moto ?");
             marque = Console.ReadLine();
             Console.WriteLine("Quel est le modèle de la moto ?");
             modele = Console.ReadLine();
             annonce = "Quel l'âge minimum pour conduire ce vehicule ?";
             agemin = SecuriteSaisieNombreINT(annonce);
-            Console.WriteLine("Quel est le carburant de la moto ?");
-            carburant = Console.ReadLine();
+            annonce = "Quel est le carburant de la moto ? \n 1.Essence \n 2.Diesel";
+            choix = 0;
+            menuver = false;
+            menuver = verification(choix, 1, 2);
+            while (menuver == false)
+            {
+                Console.Clear();
+                choix = SecuriteSaisieNombreINT(annonce);
+                menuver = verification(choix, 1, 2);
+
+            }
+
+            switch (choix)
+            {
+                case 1:
+                    carburant = "essence";
+                    break;
+                case 2:
+                    carburant = "diesel";
+                    break;
+                default:
+                    Console.WriteLine("Erreure");
+                    break;
+            }
             annonce = "Quel est le tarif pour cette moto?";
             tarif = SecuriteSaisieNombreDOUBLE(annonce);
             annonce = "Combien de place possède cette moto?";
             nbplace = SecuriteSaisieNombreINT(annonce);
             Console.WriteLine("Quel type de permis est nécessaire pour conduire cette moto ?");
-            typedepermis = Console.ReadLine();
-            int choix = 0;
+            typedepermis = Console.ReadLine().ToUpper();
+            choix = 0;
             annonce = "Qu'elle est la transmission de cette moto ? \n Tapez 1 pour Automatique et 2 pour manuel";
             choix = SecuriteSaisieNombreINT(annonce);
-            bool menuver = false;
+            menuver = false;
             menuver = verification(choix, 1, 2);
             while (menuver == false)
             {
@@ -1878,7 +2608,12 @@ namespace version_1._0
 
             moto a = new moto(immatriculation, marque, modele, agemin, carburant, tarif,
                 nbplace, typedepermis, typeVehicule, cylindre, hauteurselle, puissance, transmission);
+            bool[,] mat = new bool[21, 9];
+            Remplissage(ref mat);
+            string[] position = new string[2];
+            IndiquezPlace(mat, a, position);
             listVehicule.Add(a);
+            SauvegardeDonneMoto();
 
 
         }
@@ -1886,29 +2621,81 @@ namespace version_1._0
         public void AjoutCamion(string immatriculation)
         {
             string marque; string modele; string annonce = "";
-            int agemin; string carburant; double tarif; int nbplace; string typedepermis;
-            string typeVehicule; double poidcharge = 0.0; string dimmensioncharge = ""; int poid = 0; string transmission = "";
+            int agemin; string carburant = ""; double tarif; int nbplace; string typedepermis;
+            string typeVehicule = ""; double poidcharge = 0.0; string dimmensioncharge = ""; int poid = 0; string transmission = "";
+            int choix = 0;
+            annonce = "Quel est le type du camion? \n 1. camionette\n 2.Poids Lourd 5T\n 3.Poids Lourd 10T\n 4.Poids lourds(semi remorque) \n 5.petit camion";
+            bool menuver = false;
+            while (menuver == false)
+            {
+                Console.Clear();
+                choix = SecuriteSaisieNombreINT(annonce);
+                menuver = verification(choix, 1, 5);
 
-            Console.WriteLine("Quel est le type du camion?");
-            typeVehicule = Console.ReadLine();
+            }
+
+            switch (choix)
+            {
+                case 1:
+                    typeVehicule = "camionette";
+                    break;
+                case 2:
+                    typeVehicule = "Poids Lourd 5T";
+                    break;
+                case 3:
+                    typeVehicule = "Poids Lourd 10T";
+                    break;
+                case 4:
+                    typeVehicule = "Poids lourds(semi remorque)";
+                    break;
+                case 5:
+                    typeVehicule = "petit camion";
+                    break;
+
+                default:
+                    Console.WriteLine("Erreure");
+                    break;
+            }
             Console.WriteLine("Qu'elle est la marque du camion ?");
             marque = Console.ReadLine();
             Console.WriteLine("Quel est le modèle du camion ?");
             modele = Console.ReadLine();
             annonce = "Quel l'âge minimum pour conduire ce vehicule ?";
             agemin = SecuriteSaisieNombreINT(annonce);
-            Console.WriteLine("Quel est le carburant du camion ?");
-            carburant = Console.ReadLine();
+            annonce = "Quel est le carburant du camion ? \n 1.Essence \n 2.Diesel";
+            choix = 0;
+            menuver = false;
+            menuver = verification(choix, 1, 2);
+            while (menuver == false)
+            {
+                Console.Clear();
+                choix = SecuriteSaisieNombreINT(annonce);
+                menuver = verification(choix, 1, 2);
+
+            }
+
+            switch (choix)
+            {
+                case 1:
+                    carburant = "essence";
+                    break;
+                case 2:
+                    carburant = "diesel";
+                    break;
+                default:
+                    Console.WriteLine("Erreure");
+                    break;
+            }
             annonce = "Quel est le tarif pour ce camion?";
             tarif = SecuriteSaisieNombreDOUBLE(annonce);
             annonce = "Combien de place possède ce camion?";
             nbplace = SecuriteSaisieNombreINT(annonce);
             Console.WriteLine("Quel type de permis est nécessaire pour conduire ce camion ?");
-            typedepermis = Console.ReadLine();
-            int choix = 0;
+            typedepermis = Console.ReadLine().ToUpper();
+            choix = 0;
             annonce = "Qu'elle est la transmission de ce camion ? \n Tapez 1 pour Automatique et 2 pour manuel";
             choix = SecuriteSaisieNombreINT(annonce);
-            bool menuver = false;
+            menuver = false;
             menuver = verification(choix, 1, 2);
             while (menuver == false)
             {
@@ -1945,7 +2732,13 @@ namespace version_1._0
 
             camion a = new camion(immatriculation, marque, modele, agemin, carburant, tarif,
                 nbplace, typedepermis, typeVehicule, poidcharge, dimmensioncharge, poid, transmission);
+            bool[,] mat = new bool[21, 9];
+            Remplissage(ref mat);
+            string[] position = new string[2];
+            IndiquezPlace(mat, a, position);
             listVehicule.Add(a);
+            SauvegardeDonneCamion();
+
 
 
         }
@@ -1959,7 +2752,7 @@ namespace version_1._0
             while (cpt <= listVehicule.Count - 1 && res == false)
             {
                 v = listVehicule[cpt];
-                if (v.Immatriculation == str)
+                if (v.Immatriculation.ToLower() == str.ToLower())
                 {
                     Console.WriteLine(v.ToString());
                     res = true;
@@ -1985,12 +2778,16 @@ namespace version_1._0
             bool res = false;
             while (cpt <= listClient.Count && res == false)
             {
-                Client c = listClient[cpt];
-                if (c.Nom == nom && c.Prenom == prenom && c.Adresse == adresse)
+                if (listClient != null)
                 {
-                    Console.WriteLine(c.ToString());
-                    res = true;
+                    Client c = listClient[cpt];
+                    if (c.Nom.ToLower() == nom.ToLower() && c.Prenom.ToLower() == prenom.ToLower() && c.Adresse.ToLower() == adresse.ToLower())
+                    {
+                        Console.WriteLine(c.ToString());
+                        res = true;
+                    }
                 }
+
                 cpt++;
             }
             if (res == false)
@@ -2032,6 +2829,9 @@ namespace version_1._0
                         case 1:
                             listVehicule.RemoveAt(cpt);
                             res = true;
+                            SauvegardeDonneMoto();
+                            SauvegardeDonneVoiture();
+                            SauvegardeDonneCamion();
                             Console.WriteLine("Vehicule supprimé");
                             break;
                         case 2:
