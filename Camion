@@ -63,6 +63,13 @@ namespace version_1._0
             }
 
         }
+        public int Poid
+        {
+            get
+            {
+                return poid;
+            }
+        }
 
     }
 }
