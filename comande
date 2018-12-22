@@ -9,21 +9,21 @@ namespace version_1._0
     class commande
     {
         //attribut  
-        static int id = 0;
+
         private int numCommande;
         private double nbKilometrage;
         private vehicule vehicule;
-        private Client client;        
+        private Client client;
         private bool autoroute;
         private string villeDepart;
         private string villeArrive;
         private string datedebut;
-        private string datefin;        
+        private string datefin;
         private bool alleRetour;
 
-        
+
         //constructeur
-        public commande(double nbKilometrage, vehicule vehicule, Client client,bool autoroute,string villeDepart,string villeArrive,string datedebut, string datefin,bool alleRetour)
+        public commande(double nbKilometrage, vehicule vehicule, Client client, bool autoroute, string villeDepart, string villeArrive, string datedebut, string datefin, bool alleRetour)
         {
             if (alleRetour == false)
             {
@@ -40,10 +40,10 @@ namespace version_1._0
             this.villeArrive = villeArrive;
             this.datedebut = datedebut;
             this.datefin = datefin;
-            this.alleRetour = alleRetour;          
-            numCommande = id;
-            id++;
-           
+            this.alleRetour = alleRetour;
+            numCommande = 0;
+
+
         }
 
         //propriete
@@ -52,6 +52,10 @@ namespace version_1._0
             get
             {
                 return numCommande;
+            }
+            set
+            {
+                numCommande = value;
             }
 
         }
@@ -88,7 +92,7 @@ namespace version_1._0
             set
             {
                 vehicule = value;
-                
+
             }
         }
         public bool Autoroute
@@ -101,8 +105,8 @@ namespace version_1._0
             {
                 autoroute = value;
             }
-        } 
-        
+        }
+
         public string VilleDepart
         {
             get
