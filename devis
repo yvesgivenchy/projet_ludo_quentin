@@ -8,8 +8,7 @@ namespace version_1._0
 {
     class devis
     {
-        //attribut
-        static int id = 0;
+        //attribut        
         private int numDevis;
         private commande commande;
         private double coutTotalHt;
@@ -17,22 +16,25 @@ namespace version_1._0
         private bool validation;
 
         //constructeur
-        public devis (commande commande)
+        public devis(commande commande)
         {
             this.commande = commande;
             validation = false;
             coutTotalHt = calculcoutTotalht();
             coutTotalTtc = coutTotalHt * 1.15;
-            id++;
-            numDevis = id;
+            numDevis = 0;
         }
 
         //méthode
-        public  int NumDevis
+        public int NumDevis
         {
             get
             {
                 return numDevis;
+            }
+            set
+            {
+                numDevis = value;
             }
 
         }
@@ -55,7 +57,11 @@ namespace version_1._0
             {
                 return coutTotalHt;
             }
-            
+            set
+            {
+                coutTotalHt = value;
+            }
+
         }
 
         public double CoutTotalTtc
@@ -63,6 +69,11 @@ namespace version_1._0
             get
             {
                 return coutTotalTtc;
+            }
+            set
+            {
+                coutTotalTtc = value;
+
             }
         }
 
@@ -92,8 +103,8 @@ namespace version_1._0
 
         public override string ToString()
         {
-            return "Véhicule \n"+commande.Vehicule.AffichageVehiculeclient()+"\n Prix HT : "+coutTotalHt+
-                "\n TVA:"+coutTotalHt*0.15+"\n Prix TTC :" + coutTotalTtc;
+            return "Véhicule \n" + commande.Vehicule.AffichageVehiculeclient() + "\n Prix HT : " + coutTotalHt +
+                "\n TVA:" + coutTotalHt * 0.15 + "\n Prix TTC :" + coutTotalTtc;
         }
     }
 }
