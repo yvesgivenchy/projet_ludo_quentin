@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace version_1._0
 {
-    class moto:vehicule
+    class moto : vehicule
     {
         //attributs
         private int cylindre;
@@ -15,14 +15,35 @@ namespace version_1._0
 
         //construteur
         public moto(string immatriculation, string marque, string modele,
-            int agemin, string carburant, double tarif, int nbplace, string typedepermis, 
-            string typeVehicule, int cylindre, int hauteurselle,int puissance, string transmission) :base(immatriculation,marque,modele,agemin,carburant,tarif
-                ,nbplace, typedepermis, typeVehicule,transmission)
+            int agemin, string carburant, double tarif, int nbplace, string typedepermis,
+            string typeVehicule, int cylindre, int hauteurselle, int puissance, string transmission) : base(immatriculation, marque, modele, agemin, carburant, tarif
+                , nbplace, typedepermis, typeVehicule, transmission)
         {
             this.cylindre = cylindre;
             this.hauteurselle = hauteurselle;
             this.puissance = puissance;
             dureeminpermis = 1;
+        }
+        public int Cylindre
+        {
+            get
+            {
+                return cylindre;
+            }
+        }
+        public int HauteurSelle
+        {
+            get
+            {
+                return hauteurselle;
+            }
+        }
+        public int Puissance
+        {
+            get
+            {
+                return puissance;
+            }
         }
 
         //propriete
@@ -35,7 +56,7 @@ namespace version_1._0
 
         public override string AffichageVehiculeclient()
         {
-            return base.AffichageVehiculeclient()+ "\n Cylindré :" + cylindre + "\n Hauteur de la selle en cm : " + hauteurselle + "\n Puissance : " + puissance;
+            return base.AffichageVehiculeclient() + "\n Cylindré :" + cylindre + "\n Hauteur de la selle en cm : " + hauteurselle + "\n Puissance : " + puissance;
         }
     }
 }
