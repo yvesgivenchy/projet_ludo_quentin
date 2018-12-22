@@ -41,6 +41,7 @@ namespace version_1._0
 
         //Propriété
         
+            
         public string Nom
         {
             get
@@ -50,6 +51,36 @@ namespace version_1._0
             set
             {
                 nom = value;
+            }
+        }
+        public int AgePermis
+        {
+            get
+            {
+                return agepermis;
+            }
+            set
+            {
+                agepermis = value;
+            }
+        }
+        public bool Reserve
+        {
+            get
+            {
+                return reserve;
+
+            }
+            set
+            {
+                reserve = value;
+            }
+        }
+        public int Obtentionpermis
+        {
+            get
+            {
+                return obtentionpermis;
             }
         }
         public string Prenom
@@ -81,19 +112,13 @@ namespace version_1._0
             {
                 return identifiant;
             }
-        }
-        public bool Reserve
-        {
-            get
-            {
-                return reserve;
-            }
             set
             {
-                reserve = value;
+                identifiant = value;
             }
         }
-        public string DatedeNiassance
+       
+        public string DatedeNaissance
         {
             get
             {
@@ -112,6 +137,13 @@ namespace version_1._0
                 typePermis=value;
             }
 
+        }
+        public string Mail
+        {
+            get
+            {
+                return email;
+            }
         }
 
 
