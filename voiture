@@ -6,25 +6,54 @@ using System.Threading.Tasks;
 
 namespace version_1._0
 {
-    class voiture:vehicule
+    class voiture : vehicule
     {
         //attribut
         private int nbporte;
-        private bool climatisation;        
+        private bool climatisation;
         private int capacite;
 
         //constructeur
         public voiture(string immatriculation, string marque, string modele,
             int agemin, string carburant, double tarif, int nbplace, string typedepermis,
-            int nbporte,bool climatisation,int capacite,string typeVehicule, string transmission) :base(immatriculation,marque,modele,agemin,
-                carburant,tarif,nbplace,typedepermis,typeVehicule,transmission)
+            int nbporte, bool climatisation, int capacite, string typeVehicule, string transmission) : base(immatriculation, marque, modele, agemin,
+                carburant, tarif, nbplace, typedepermis, typeVehicule, transmission)
         {
             this.nbporte = nbporte;
             this.climatisation = climatisation;
             this.transmission = transmission;
             this.capacite = capacite;
             dureeminpermis = 1;
-            
+
+        }
+        public int Nbporte
+        {
+            get
+            {
+                return nbporte;
+            }
+        }
+        public bool Climatisation
+        {
+            get
+            {
+                return climatisation;
+            }
+        }
+
+        public int Capacite
+        {
+            get
+            {
+                return capacite;
+            }
+        }
+        public int DuereeMinPermis
+        {
+            get
+            {
+                return dureeminpermis;
+            }
         }
 
         //méthode
@@ -36,7 +65,7 @@ namespace version_1._0
 
         public override string AffichageVehiculeclient()
         {
-            return base.AffichageVehiculeclient()+ "\n Nombre de portes : " + nbporte + "\n Climatisation : " + climatisation + "\n Transmission: " + transmission
+            return base.AffichageVehiculeclient() + "\n Nombre de portes : " + nbporte + "\n Climatisation : " + climatisation + "\n Transmission: " + transmission
                 + "\n Capacité : " + capacite;
         }
 
